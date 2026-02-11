@@ -1,8 +1,7 @@
 services:
   bugio:
-    image: ${CONTAINER_IMAGE:-bugio}
     build: .
-    container_name: ${CONTAINER_NAME:-bugio}
+    container_name: bugio
     restart: unless-stopped
     env_file: .env
     ports:
