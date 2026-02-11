@@ -3,38 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b0d">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="<%= settings.systemName || 'BugIO' %>">
   <title><%= title %> - <%= settings.systemName || 'BugIO' %></title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <% if (settings.primaryColor && settings.primaryColor !== '#4a90d9') { %>
   <style>
     :root {
-      --primary-color: <%= settings.primaryColor || '#4a90d9' %>;
-      --primary-hover: color-mix(in srgb, <%= settings.primaryColor || '#4a90d9' %> 80%, black);
+      --primary: <%= settings.primaryColor %>;
+      --primary-hover: color-mix(in srgb, <%= settings.primaryColor %> 80%, black);
+      --border-focus: <%= settings.primaryColor %>;
+      --glow-primary: color-mix(in srgb, <%= settings.primaryColor %> 15%, transparent);
     }
   </style>
+  <% } %>
 </head>
 <body>
-  <nav class="navbar">
-    <div class="container nav-content">
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <div class="mobile-header-content">
       <a href="/" class="logo">
-        <% if (settings.logoPath) { %>
-          <img src="<%= settings.logoPath %>" alt="<%= settings.systemName || 'BugIO' %>">
-        <% } else { %>
-          <span class="logo-text"><%= settings.systemName || 'BugIO' %></span>
-        <% } %>
+        <img src="/logo.svg" alt="<%= settings.systemName || 'BugIO' %>" class="logo-img">
       </a>
-      <div class="nav-links">
-        <a href="/">Tickets</a>
-        <a href="/create">New Ticket</a>
-        <% if (user) { %>
-          <% if (user.role === 'admin') { %>
-            <a href="/admin">Admin</a>
-          <% } %>
-          <span class="user-info"><%= user.email %></span>
-          <a href="/logout" class="btn btn-small">Logout</a>
-        <% } else { %>
-          <a href="/login" class="btn btn-small">Login</a>
-        <% } %>
-      </div>
+      <% if (user) { %>
+        <a href="/admin" class="mobile-header-action" title="Settings">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </a>
+      <% } else { %>
+        <a href="/login" class="mobile-header-action" title="Login">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        </a>
+      <% } %>
     </div>
+  </header>
+
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/" class="logo">
+        <img src="/logo.svg" alt="<%= settings.systemName || 'BugIO' %>" class="logo-img">
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/" class="sidebar-link" data-page="tickets">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        <span>Tickets</span>
+      </a>
+      <a href="/create" class="sidebar-link" data-page="create">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <span>New Ticket</span>
+      </a>
+      <% if (user && user.role === 'admin') { %>
+        <a href="/admin" class="sidebar-link" data-page="admin">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Dashboard</span>
+        </a>
+      <% } %>
+    </nav>
+
+    <div class="sidebar-footer">
+      <% if (user) { %>
+        <div class="sidebar-user">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span class="sidebar-user-email"><%= user.email %></span>
+        </div>
+        <a href="/logout" id="logout-btn" class="sidebar-link sidebar-link-danger">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Logout</span>
+        </a>
+      <% } else { %>
+        <a href="/login" class="sidebar-link">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          <span>Login</span>
+        </a>
+        <a href="/register" class="sidebar-link">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          <span>Register</span>
+        </a>
+      <% } %>
+    </div>
+  </aside>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="/" class="bottom-nav-item" data-page="tickets">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+      <span>Tickets</span>
+    </a>
+    <a href="/create" class="bottom-nav-item" data-page="create">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      <span>New</span>
+    </a>
+    <% if (user && user.role === 'admin') { %>
+      <a href="/admin" class="bottom-nav-item" data-page="admin">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>Admin</span>
+      </a>
+    <% } %>
+    <% if (user) { %>
+      <a href="/logout" class="bottom-nav-item" id="logout-btn-mobile">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span>Logout</span>
+      </a>
+    <% } else { %>
+      <a href="/login" class="bottom-nav-item" data-page="login">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+        <span>Login</span>
+      </a>
+    <% } %>
   </nav>
-  <main class="container">
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="main-container">

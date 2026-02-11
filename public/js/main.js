@@ -147,6 +147,7 @@ async function handleLogin(event) {
     if (result.success && result.data && result.data.token) {
       localStorage.setItem('token', result.data.token);
       localStorage.setItem('user', JSON.stringify(result.data.user));
+      document.cookie = `token=${result.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 
       // Redirect to original page or home
       const params = new URLSearchParams(window.location.search);
@@ -185,6 +186,7 @@ async function handleRegister(event) {
       if (loginResult.success && loginResult.data && loginResult.data.token) {
         localStorage.setItem('token', loginResult.data.token);
         localStorage.setItem('user', JSON.stringify(loginResult.data.user));
+        document.cookie = `token=${loginResult.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
         window.location.href = '/';
       } else {
         window.location.href = '/login';
@@ -212,7 +214,7 @@ async function handleCreateTicket(event) {
   // Add email for anonymous submissions
   const emailField = form.email;
   if (emailField && emailField.value) {
-    data.email = emailField.value;
+    data.author_email = emailField.value;
   }
 
   try {
@@ -248,6 +250,7 @@ function showFormError(form, message) {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  document.cookie = 'token=; path=/; max-age=0';
   window.location.href = '/';
 }
 
@@ -255,6 +258,14 @@ function logout() {
 document.addEventListener('DOMContentLoaded', () => {
   // Update nav based on login state
   const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+  // Handle logout (desktop sidebar + mobile bottom nav)
+  document.querySelectorAll('#logout-btn, #logout-btn-mobile').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      logout();
+    });
+  });
 
   // Handle forms with data-form attribute
   document.querySelectorAll('form[data-form]').forEach(form => {

@@ -23,13 +23,28 @@ function isValidStatus(status: string | undefined): status is TicketStatus {
 
 // Helper to decode JWT and get user (optional auth)
 function getUserFromRequest(req: Request): User | null {
+  // Try Authorization header first, then fall back to cookie
+  let token: string | undefined;
+
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  } else {
+    // Parse token from cookie
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader) {
+      const match = cookieHeader.split(';').map(c => c.trim()).find(c => c.startsWith('token='));
+      if (match) {
+        token = match.substring(6);
+      }
+    }
+  }
+
+  if (!token) {
     return null;
   }
 
   try {
-    const token = authHeader.substring(7);
     const decoded = jwt.verify(token, config.jwtSecret) as { userId: number; role: string };
     const db = getDatabase();
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.userId) as User | undefined;

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { ticketService } from '../services/ticket.service.js';
 import { voteService } from '../services/vote.service.js';
 import { commentService } from '../services/comment.service.js';
-import { authenticate, optionalAuth, requireAdmin } from '../middleware/auth.js';
+import { authenticate, optionalAuth, requireAdmin, anonymousTicketRateLimit } from '../middleware/auth.js';
 import {
   validateBody,
   validateQuery,
@@ -72,21 +72,14 @@ router.get('/:id', optionalAuth, (req: Request, res: Response<ApiResponse<Ticket
   res.json({ success: true, data: ticket });
 });
 
-// POST /api/tickets - Create ticket (anonymous allowed)
+// POST /api/tickets - Create ticket (anonymous allowed, rate limited)
 router.post(
   '/',
   optionalAuth,
+  anonymousTicketRateLimit,
   validateBody(createTicketSchema),
   (req: Request, res: Response<ApiResponse<Ticket>>) => {
     const body = req.body as CreateTicketRequest;
-    // If not logged in, require author_email
-    if (!req.user && !body.author_email) {
-      res.status(400).json({
-        success: false,
-        error: 'Email is required for anonymous submissions',
-      });
-      return;
-    }
 
     const ticket = ticketService.create(body, req.user?.userId || null);
 

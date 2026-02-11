@@ -1,9 +1,21 @@
-  </main>
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; <%= new Date().getFullYear() %> <%= settings.systemName || 'BugIO' %> - Lightweight Bug & Feature Tracker</p>
     </div>
-  </footer>
+  </main>
   <script src="/js/main.js"></script>
+  <script>
+    // Highlight active nav items
+    (function() {
+      var path = window.location.pathname;
+      var page = 'tickets';
+      if (path === '/create') page = 'create';
+      else if (path === '/admin') page = 'admin';
+      else if (path === '/login') page = 'login';
+      else if (path === '/register') page = 'register';
+      else if (path.startsWith('/ticket/')) page = 'tickets';
+
+      document.querySelectorAll('[data-page="' + page + '"]').forEach(function(el) {
+        el.classList.add('active');
+      });
+    })();
+  </script>
 </body>
 </html>

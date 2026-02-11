@@ -2,7 +2,11 @@
 
 <div class="auth-container">
   <div class="auth-form">
-    <h1>Login</h1>
+    <div class="auth-logo">
+      <img src="/logo-icon.svg" alt="BugIO">
+    </div>
+    <h1><%= settings.systemName || 'BugIO' %></h1>
+    <p class="auth-subtitle">Login to your account</p>
 
     <form data-form="login">
       <div class="form-group">

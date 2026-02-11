@@ -29,16 +29,16 @@
         <span class="vote-btn" title="Login to vote">△</span>
       <% } %>
       <span class="vote-count"><%= ticket.voteCount %></span>
-      <span>votes</span>
+      <span style="color: var(--text-disabled);">votes</span>
     </div>
   </div>
 
   <% if (user && user.role === 'admin') { %>
-    <div class="card" style="margin-bottom: 1.5rem; background: #f8f9fa;">
+    <div class="card" style="margin-bottom: 1.5rem;">
       <strong>Admin Actions:</strong>
       <form style="display: inline-block; margin-left: 1rem;" onsubmit="event.preventDefault(); handleStatusChange(<%= ticket.id %>, this.status.value);">
-        <label>Change Status:</label>
-        <select name="status" style="padding: 0.5rem; margin: 0 0.5rem;">
+        <label style="color: var(--text-secondary);">Change Status:</label>
+        <select name="status" style="padding: 0.5rem; margin: 0 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-surface); color: var(--text-primary); font-family: inherit;">
           <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
           <option value="in_review" <%= ticket.status === 'in_review' ? 'selected' : '' %>>In Review</option>
           <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
@@ -58,7 +58,7 @@
     <h3>Comments (<%= comments.length %>)</h3>
 
     <% if (comments.length === 0) { %>
-      <p style="color: #666; margin: 1rem 0;">No comments yet. Be the first to comment!</p>
+      <p style="color: var(--text-disabled); margin: 1rem 0;">No comments yet. Be the first to comment!</p>
     <% } else { %>
       <% comments.forEach(comment => { %>
         <div class="comment">
