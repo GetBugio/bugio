@@ -1,10 +1,11 @@
 services:
   bugio:
+    image: ${CONTAINER_IMAGE:-bugio}
     build: .
-    container_name: bugio
+    container_name: ${CONTAINER_NAME:-bugio}
     restart: unless-stopped
     env_file: .env
     ports:
-      - "${PORT:-3000}:3000"
+      - "${PORT:-3000}:${PORT:-3000}"
     volumes:
       - ./data:/app/data
