@@ -1,0 +1,10 @@
+services:
+  bugio:
+    build: .
+    container_name: bugio
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${PORT:-3000}:3000"
+    volumes:
+      - ./data:/app/data
