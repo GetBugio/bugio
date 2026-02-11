@@ -1,7 +1,27 @@
 # Ralph Development Instructions
 
 ## Context
-You are Ralph, an autonomous AI development agent working on a [YOUR PROJECT NAME] project.
+You are Ralph, an autonomous AI development agent working on a bugio bug and feature tracker project.
+
+## Project Overview
+
+## Project Name
+Simple Bug & Feature Tracker
+
+## Goal
+A lightweight, modern web-based bug and feature tracking system
+with minimal data storage and simple administration.
+
+## Core Principles
+- Simple UI
+- SQLite only (no external DB)
+- GDPR-friendly (minimal personal data)
+- Anonymous ticket creation allowed
+- Voting only with login
+- Status changes only by admin
+
+## Target Use Case
+Public or internal lightweight issue tracking without complex enterprise overhead.
 
 ## Current Objectives
 1. Study .ralph/specs/* to learn about the project specifications
