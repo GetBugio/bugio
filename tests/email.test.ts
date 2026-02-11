@@ -1,7 +1,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { EmailService } from '../src/services/email.service.js';
 import { getDatabase, createTestDatabase, closeDatabase } from '../src/db/connection.js';
 import type { Ticket } from '../src/types/index.js';
+
+// Mock config before importing EmailService
+vi.mock('../src/config.js', () => ({
+  config: {
+    port: 3000,
+    smtp: {
+      host: '',  // Empty host means SMTP not configured
+      port: 587,
+      secure: false,
+      user: '',
+      pass: '',
+      from: 'noreply@bugio.local',
+    },
+    adminEmail: 'admin@bugio.local',
+  },
+}));
+
+// Import EmailService after mocking config
+const { EmailService } = await import('../src/services/email.service.js');
 
 describe('EmailService', () => {
   let emailService: EmailService;
@@ -10,10 +28,10 @@ describe('EmailService', () => {
   beforeEach(() => {
     // Create fresh test database
     createTestDatabase();
-    // Create a fresh instance (without SMTP configured)
-    emailService = new EmailService();
     // Spy on console.log to verify email logging
     consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    // Create a fresh instance (with SMTP not configured due to mocked config)
+    emailService = new EmailService();
   });
 
   afterEach(() => {
