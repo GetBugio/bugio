@@ -2,48 +2,78 @@
 
 ## Project Setup
 ```bash
-# Install dependencies (example for Node.js project)
+# Install dependencies
 npm install
 
-# Or for Python project
-pip install -r requirements.txt
+# Copy environment file and configure
+cp .env.example .env
+# Edit .env with your settings (JWT_SECRET, SMTP config, etc.)
 
-# Or for Rust project  
-cargo build
+# Initialize database with admin user
+npm run db:init
 ```
 
 ## Running Tests
 ```bash
-# Node.js
+# Run all tests
 npm test
 
-# Python
-pytest
+# Run tests in watch mode
+npm run test:watch
 
-# Rust
-cargo test
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ## Build Commands
 ```bash
-# Production build
+# Compile TypeScript to JavaScript
 npm run build
-# or
-cargo build --release
+
+# The compiled output will be in ./dist/
 ```
 
 ## Development Server
 ```bash
-# Start development server
+# Start development server with hot reload
 npm run dev
-# or
-cargo run
+
+# The server runs on http://localhost:3000 by default
 ```
 
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and get JWT token
+- `GET /api/auth/me` - Get current user (requires auth)
+
+### Tickets
+- `GET /api/tickets` - List tickets (with pagination, filtering, sorting)
+- `GET /api/tickets/:id` - Get single ticket
+- `POST /api/tickets` - Create ticket (anonymous allowed with email)
+- `PATCH /api/tickets/:id` - Update ticket (owner or admin)
+- `DELETE /api/tickets/:id` - Soft delete ticket
+- `PATCH /api/tickets/:id/status` - Update status (admin only)
+
+### Voting
+- `POST /api/tickets/:id/vote` - Vote on ticket (requires auth)
+- `DELETE /api/tickets/:id/vote` - Remove vote
+
+### Comments
+- `GET /api/tickets/:id/comments` - List comments
+- `POST /api/tickets/:id/comments` - Add comment (requires auth)
+- `DELETE /api/tickets/:id/comments/:commentId` - Delete comment (admin only)
+
+### Health
+- `GET /api/health` - Health check endpoint
+
 ## Key Learnings
-- Update this section when you learn new build optimizations
-- Document any gotchas or special setup requirements
-- Keep track of the fastest test/build cycle
+- Using better-sqlite3 for synchronous SQLite operations
+- JWT authentication with configurable expiry
+- Zod for request validation
+- Vitest for testing with supertest for API tests
+- TypeScript with strict mode enabled
 
 ## Feature Development Quality Standards
 
@@ -59,10 +89,7 @@ cargo run
   - End-to-end tests for critical user workflows
 - **Coverage Validation**: Run coverage reports before marking features complete:
   ```bash
-  # Examples by language/framework
   npm run test:coverage
-  pytest --cov=src tests/ --cov-report=term-missing
-  cargo tarpaulin --out Html
   ```
 - **Test Quality**: Tests must validate behavior, not just achieve coverage metrics
 - **Test Documentation**: Complex test scenarios must include comments explaining the test strategy
