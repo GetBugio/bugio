@@ -70,6 +70,14 @@ export interface Setting {
   value: string;
 }
 
+// Settings update request
+export interface UpdateSettingsRequest {
+  system_name?: string;
+  primary_color?: string;
+  logo_path?: string;
+  default_statuses?: string;
+}
+
 // API Request types
 export interface CreateTicketRequest {
   title: string;

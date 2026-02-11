@@ -65,6 +65,13 @@ npm run dev
 - `POST /api/tickets/:id/comments` - Add comment (requires auth)
 - `DELETE /api/tickets/:id/comments/:commentId` - Delete comment (admin only)
 
+### Settings
+- `GET /api/settings` - Get all settings (public)
+- `GET /api/settings/:key` - Get single setting (public)
+- `PATCH /api/settings` - Update settings (admin only)
+- `POST /api/settings/reset` - Reset all settings to defaults (admin only)
+- `POST /api/settings/:key/reset` - Reset single setting to default (admin only)
+
 ### Health
 - `GET /api/health` - Health check endpoint
 
