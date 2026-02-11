@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - <%= settings.systemName || 'BugIO' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --primary-color: <%= settings.primaryColor || '#4a90d9' %>;
+      --primary-hover: color-mix(in srgb, <%= settings.primaryColor || '#4a90d9' %> 80%, black);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="/" class="logo">
+        <% if (settings.logoPath) { %>
+          <img src="<%= settings.logoPath %>" alt="<%= settings.systemName || 'BugIO' %>">
+        <% } else { %>
+          <span class="logo-text"><%= settings.systemName || 'BugIO' %></span>
+        <% } %>
+      </a>
+      <div class="nav-links">
+        <a href="/">Tickets</a>
+        <a href="/create">New Ticket</a>
+        <% if (user) { %>
+          <% if (user.role === 'admin') { %>
+            <a href="/admin">Admin</a>
+          <% } %>
+          <span class="user-info"><%= user.email %></span>
+          <a href="/logout" class="btn btn-small">Logout</a>
+        <% } else { %>
+          <a href="/login" class="btn btn-small">Login</a>
+        <% } %>
+      </div>
+    </div>
+  </nav>
+  <main class="container">

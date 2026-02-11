@@ -1,0 +1,97 @@
+<%- include('partials/header') %>
+
+<div class="ticket-detail">
+  <div class="ticket-detail-header">
+    <div>
+      <h1 class="ticket-detail-title">
+        <%= ticket.title %>
+        <span class="tag tag-<%= ticket.tag %>"><%= ticket.tag %></span>
+      </h1>
+
+      <div class="ticket-detail-meta">
+        <span class="status status-<%= ticket.status.replace(' ', '_').toLowerCase() %>"><%= ticket.status.replace('_', ' ') %></span>
+        <span>#<%= ticket.id %></span>
+        <span>Opened <%= new Date(ticket.createdAt).toLocaleString() %></span>
+        <% if (ticket.creatorEmail) { %>
+          <span>by <%= ticket.creatorEmail %></span>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="ticket-votes" style="flex-direction: row; gap: 0.75rem;">
+      <% if (user) { %>
+        <button class="vote-btn <%= ticket.hasVoted ? 'voted' : '' %>"
+                onclick="handleVote(<%= ticket.id %>, '<%= ticket.hasVoted ? 'remove' : 'add' %>')"
+                title="<%= ticket.hasVoted ? 'Remove vote' : 'Upvote' %>">
+          <%= ticket.hasVoted ? '▲' : '△' %>
+        </button>
+      <% } else { %>
+        <span class="vote-btn" title="Login to vote">△</span>
+      <% } %>
+      <span class="vote-count"><%= ticket.voteCount %></span>
+      <span>votes</span>
+    </div>
+  </div>
+
+  <% if (user && user.role === 'admin') { %>
+    <div class="card" style="margin-bottom: 1.5rem; background: #f8f9fa;">
+      <strong>Admin Actions:</strong>
+      <form style="display: inline-block; margin-left: 1rem;" onsubmit="event.preventDefault(); handleStatusChange(<%= ticket.id %>, this.status.value);">
+        <label>Change Status:</label>
+        <select name="status" style="padding: 0.5rem; margin: 0 0.5rem;">
+          <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
+          <option value="in_review" <%= ticket.status === 'in_review' ? 'selected' : '' %>>In Review</option>
+          <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+          <option value="rejected" <%= ticket.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+          <option value="completed" <%= ticket.status === 'completed' ? 'selected' : '' %>>Completed</option>
+        </select>
+        <button type="submit" class="btn btn-small btn-primary">Update</button>
+      </form>
+    </div>
+  <% } %>
+
+  <div class="ticket-detail-description">
+    <%= ticket.description %>
+  </div>
+
+  <div class="comments-section">
+    <h3>Comments (<%= comments.length %>)</h3>
+
+    <% if (comments.length === 0) { %>
+      <p style="color: #666; margin: 1rem 0;">No comments yet. Be the first to comment!</p>
+    <% } else { %>
+      <% comments.forEach(comment => { %>
+        <div class="comment">
+          <div class="comment-header">
+            <span class="comment-author"><%= comment.userEmail %></span>
+            <span class="comment-date"><%= new Date(comment.createdAt).toLocaleString() %></span>
+            <% if (user && user.role === 'admin') { %>
+              <button class="btn btn-small btn-danger" onclick="deleteComment(<%= ticket.id %>, <%= comment.id %>)">Delete</button>
+            <% } %>
+          </div>
+          <div class="comment-body"><%= comment.content %></div>
+        </div>
+      <% }) %>
+    <% } %>
+
+    <% if (user) { %>
+      <form class="card" style="margin-top: 1.5rem;" onsubmit="submitComment(event, <%= ticket.id %>)">
+        <h4>Add a Comment</h4>
+        <div class="form-group" style="margin-top: 1rem;">
+          <textarea name="content" placeholder="Write your comment..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+      </form>
+    <% } else { %>
+      <div class="card" style="margin-top: 1.5rem; text-align: center;">
+        <p><a href="/login?redirect=/ticket/<%= ticket.id %>">Login</a> to leave a comment.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div style="margin-top: 1.5rem;">
+  <a href="/" class="btn btn-secondary">&larr; Back to Tickets</a>
+</div>
+
+<%- include('partials/footer') %>

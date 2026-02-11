@@ -75,12 +75,36 @@ npm run dev
 ### Health
 - `GET /api/health` - Health check endpoint
 
+## Frontend Pages
+
+The application includes a server-rendered frontend using EJS templates:
+
+- `/` - Ticket listing with filters and pagination
+- `/ticket/:id` - Ticket detail with voting and comments
+- `/create` - Create new ticket form
+- `/login` - User login
+- `/register` - User registration
+- `/admin` - Admin dashboard (admin only)
+- `/logout` - Logout (clears client-side token)
+
+### Frontend Architecture
+
+- **Template Engine**: EJS
+- **Styling**: Custom CSS with CSS variables for theming
+- **JavaScript**: Vanilla JS for API interactions (auth, voting, comments)
+- **Token Storage**: JWT stored in localStorage
+- **Views Location**: `src/views/`
+- **Static Assets**: `public/css/` and `public/js/`
+
 ## Key Learnings
 - Using better-sqlite3 for synchronous SQLite operations
 - JWT authentication with configurable expiry
 - Zod for request validation
 - Vitest for testing with supertest for API tests
 - TypeScript with strict mode enabled
+- EJS templating for server-rendered views
+- Dynamic theming via CSS variables from settings
+- process.cwd() for cross-environment path resolution
 
 ## Feature Development Quality Standards
 

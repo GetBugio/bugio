@@ -1,0 +1,136 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <h1>Admin Dashboard</h1>
+</div>
+
+<div class="admin-grid">
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.totalTickets %></div>
+    <div class="stat-label">Total Tickets</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.openTickets %></div>
+    <div class="stat-label">Open</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.inProgressTickets %></div>
+    <div class="stat-label">In Progress</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.completedTickets %></div>
+    <div class="stat-label">Completed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value"><%= stats.totalUsers %></div>
+    <div class="stat-label">Users</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 2rem;">
+  <h2>Recent Tickets</h2>
+  <table class="admin-table" style="margin-top: 1rem;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Votes</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% recentTickets.forEach(ticket => { %>
+        <tr>
+          <td>#<%= ticket.id %></td>
+          <td><a href="/ticket/<%= ticket.id %>"><%= ticket.title.substring(0, 50) %><%= ticket.title.length > 50 ? '...' : '' %></a></td>
+          <td><span class="tag tag-<%= ticket.tag %>"><%= ticket.tag %></span></td>
+          <td>
+            <select onchange="handleStatusChange(<%= ticket.id %>, this.value)" style="padding: 0.25rem;">
+              <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
+              <option value="in_review" <%= ticket.status === 'in_review' ? 'selected' : '' %>>In Review</option>
+              <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
+              <option value="rejected" <%= ticket.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+              <option value="completed" <%= ticket.status === 'completed' ? 'selected' : '' %>>Completed</option>
+            </select>
+          </td>
+          <td><%= ticket.voteCount %></td>
+          <td><%= new Date(ticket.createdAt).toLocaleDateString() %></td>
+          <td><a href="/ticket/<%= ticket.id %>" class="btn btn-small btn-secondary">View</a></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Settings</h2>
+  <form id="settings-form" style="margin-top: 1rem;">
+    <div class="form-group">
+      <label for="systemName">System Name</label>
+      <input type="text" id="systemName" name="systemName" value="<%= settings.systemName || '' %>" placeholder="BugIO">
+    </div>
+
+    <div class="form-group">
+      <label for="primaryColor">Primary Color</label>
+      <input type="color" id="primaryColor" name="primaryColor" value="<%= settings.primaryColor || '#4a90d9' %>" style="width: 100px; height: 40px;">
+    </div>
+
+    <div class="form-group">
+      <label for="logoPath">Logo URL (optional)</label>
+      <input type="text" id="logoPath" name="logoPath" value="<%= settings.logoPath || '' %>" placeholder="/img/logo.png or https://...">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+    <button type="button" class="btn btn-secondary" onclick="resetSettings()">Reset to Defaults</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('settings-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    try {
+      const result = await api.patch('/api/settings', {
+        systemName: form.systemName.value,
+        primaryColor: form.primaryColor.value,
+        logoPath: form.logoPath.value || null,
+      });
+
+      if (result.success) {
+        alert('Settings saved successfully!');
+        window.location.reload();
+      } else {
+        alert(result.error || 'Failed to save settings');
+      }
+    } catch (error) {
+      console.error('Settings error:', error);
+      alert('Failed to save settings');
+    }
+  });
+
+  async function resetSettings() {
+    if (!confirm('Are you sure you want to reset all settings to defaults?')) {
+      return;
+    }
+
+    try {
+      const result = await api.post('/api/settings/reset');
+
+      if (result.success) {
+        alert('Settings reset successfully!');
+        window.location.reload();
+      } else {
+        alert(result.error || 'Failed to reset settings');
+      }
+    } catch (error) {
+      console.error('Reset settings error:', error);
+      alert('Failed to reset settings');
+    }
+  }
+</script>
+
+<%- include('partials/footer') %>

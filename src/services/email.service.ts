@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import { config } from '../config.js';
 import { getDatabase } from '../db/connection.js';
-import type { Ticket, TicketStatus, User } from '../types/index.js';
+import type { Ticket, TicketStatus } from '../types/index.js';
 
 // Email template types
 export type EmailTemplate =
