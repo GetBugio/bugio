@@ -62,6 +62,10 @@ CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
 INSERT OR IGNORE INTO settings (key, value) VALUES
   ('system_name', 'Bugio'),
   ('primary_color', '#3b82f6'),
+  ('secondary_color', '#8b5cf6'),
+  ('success_color', '#22c55e'),
+  ('warning_color', '#f59e0b'),
+  ('error_color', '#ef4444'),
   ('logo_path', ''),
   ('default_statuses', 'open,in_review,in_progress,rejected,completed');
 `;

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authService } from '../services/auth.service.js';
-import { validateBody, registerSchema, loginSchema } from '../middleware/validation.js';
+import { validateBody, registerSchema, loginSchema, changePasswordSchema, changeEmailSchema } from '../middleware/validation.js';
 import { authenticate } from '../middleware/auth.js';
 import type { ApiResponse, SafeUser, RegisterRequest, LoginRequest } from '../types/index.js';
 
@@ -59,5 +59,47 @@ router.get('/me', authenticate, (req: Request, res: Response<ApiResponse<SafeUse
 
   res.json({ success: true, data: user });
 });
+
+// POST /api/auth/change-password
+router.post(
+  '/change-password',
+  authenticate,
+  validateBody(changePasswordSchema),
+  async (req: Request, res: Response<ApiResponse>) => {
+    if (!req.user) {
+      res.status(401).json({ success: false, error: 'Not authenticated' });
+      return;
+    }
+
+    try {
+      await authService.changePassword(req.user.userId, req.body.currentPassword, req.body.newPassword);
+      res.json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to change password';
+      res.status(400).json({ success: false, error: message });
+    }
+  }
+);
+
+// POST /api/auth/change-email
+router.post(
+  '/change-email',
+  authenticate,
+  validateBody(changeEmailSchema),
+  async (req: Request, res: Response<ApiResponse>) => {
+    if (!req.user) {
+      res.status(401).json({ success: false, error: 'Not authenticated' });
+      return;
+    }
+
+    try {
+      const user = await authService.changeEmail(req.user.userId, req.body.password, req.body.newEmail);
+      res.json({ success: true, data: user, message: 'Email changed successfully' });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to change email';
+      res.status(400).json({ success: false, error: message });
+    }
+  }
+);
 
 export default router;

@@ -74,6 +74,10 @@ export interface Setting {
 export interface UpdateSettingsRequest {
   system_name?: string;
   primary_color?: string;
+  secondary_color?: string;
+  success_color?: string;
+  warning_color?: string;
+  error_color?: string;
   logo_path?: string;
   default_statuses?: string;
 }

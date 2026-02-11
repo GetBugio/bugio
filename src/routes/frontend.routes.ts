@@ -63,6 +63,10 @@ function getCommonViewData(req: Request) {
     settings: {
       systemName: settings.system_name,
       primaryColor: settings.primary_color,
+      secondaryColor: settings.secondary_color,
+      successColor: settings.success_color,
+      warningColor: settings.warning_color,
+      errorColor: settings.error_color,
       logoPath: settings.logo_path,
     },
     user,
@@ -270,6 +274,23 @@ router.get('/admin', (req: Request, res: Response) => {
       totalUsers,
     },
     recentTickets,
+  });
+});
+
+// Settings page (logged-in users only)
+router.get('/settings', (req: Request, res: Response) => {
+  const common = getCommonViewData(req);
+
+  if (!common.user) {
+    return res.redirect('/login');
+  }
+
+  const allSettings = settingsService.getAll();
+
+  res.render('settings', {
+    ...common,
+    title: 'Einstellungen',
+    allSettings,
   });
 });
 

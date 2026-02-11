@@ -13,6 +13,16 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: z.string().min(4, 'New password must be at least 4 characters'),
+});
+
+export const changeEmailSchema = z.object({
+  password: z.string().min(1, 'Password is required'),
+  newEmail: z.string().email('Invalid email address'),
+});
+
 export const createTicketSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200, 'Title too long'),
   description: z.string().min(10, 'Description must be at least 10 characters').max(10000, 'Description too long'),

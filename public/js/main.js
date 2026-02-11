@@ -48,7 +48,6 @@ async function handleVote(ticketId, action) {
     }
 
     if (result.success) {
-      // Reload page to show updated vote count
       window.location.reload();
     } else {
       alert(result.error || 'Failed to update vote');
@@ -149,7 +148,6 @@ async function handleLogin(event) {
       localStorage.setItem('user', JSON.stringify(result.data.user));
       document.cookie = `token=${result.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
 
-      // Redirect to original page or home
       const params = new URLSearchParams(window.location.search);
       const redirect = params.get('redirect') || '/';
       window.location.href = redirect;
@@ -180,7 +178,6 @@ async function handleRegister(event) {
     const result = await api.post('/api/auth/register', { email, password });
 
     if (result.success) {
-      // Auto-login after registration
       const loginResult = await api.post('/api/auth/login', { email, password });
 
       if (loginResult.success && loginResult.data && loginResult.data.token) {
@@ -211,7 +208,6 @@ async function handleCreateTicket(event) {
     tag: form.tag.value,
   };
 
-  // Add email for anonymous submissions
   const emailField = form.email;
   if (emailField && emailField.value) {
     data.author_email = emailField.value;
@@ -231,17 +227,25 @@ async function handleCreateTicket(event) {
   }
 }
 
-// Show form error message
+// Show form error/success message
 function showFormError(form, message) {
-  // Remove existing error
   const existing = form.querySelector('.alert-error');
-  if (existing) {
-    existing.remove();
-  }
+  if (existing) existing.remove();
 
-  // Add new error
   const alert = document.createElement('div');
   alert.className = 'alert alert-error';
+  alert.textContent = message;
+  form.insertBefore(alert, form.firstChild);
+}
+
+function showFormSuccess(form, message) {
+  const existing = form.querySelector('.alert-success');
+  if (existing) existing.remove();
+  const existingError = form.querySelector('.alert-error');
+  if (existingError) existingError.remove();
+
+  const alert = document.createElement('div');
+  alert.className = 'alert alert-success';
   alert.textContent = message;
   form.insertBefore(alert, form.firstChild);
 }
@@ -254,18 +258,178 @@ function logout() {
   window.location.href = '/';
 }
 
+// Theme toggle
+function setTheme(theme) {
+  localStorage.setItem('theme', theme);
+  if (theme === 'light') {
+    document.documentElement.classList.add('light');
+    var meta = document.getElementById('meta-theme-color');
+    if (meta) meta.setAttribute('content', '#f8f8fa');
+  } else {
+    document.documentElement.classList.remove('light');
+    var meta = document.getElementById('meta-theme-color');
+    if (meta) meta.setAttribute('content', '#0b0b0d');
+  }
+}
+
+function getTheme() {
+  return localStorage.getItem('theme') || 'dark';
+}
+
+function updateThemeLabels(theme) {
+  document.querySelectorAll('.theme-toggle-label').forEach(el => {
+    el.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+}
+
+// Settings form handlers
+async function handleChangePassword(event) {
+  event.preventDefault();
+  const form = event.target;
+
+  const currentPassword = form.currentPassword.value;
+  const newPassword = form.newPassword.value;
+  const confirmNewPassword = form.confirmNewPassword.value;
+
+  if (newPassword !== confirmNewPassword) {
+    showFormError(form, 'Neue Passwoerter stimmen nicht ueberein');
+    return;
+  }
+
+  if (newPassword.length < 4) {
+    showFormError(form, 'Neues Passwort muss mindestens 4 Zeichen haben');
+    return;
+  }
+
+  try {
+    const result = await api.post('/api/auth/change-password', { currentPassword, newPassword });
+    if (result.success) {
+      showFormSuccess(form, 'Passwort erfolgreich geaendert');
+      form.reset();
+    } else {
+      showFormError(form, result.error || 'Fehler beim Aendern des Passworts');
+    }
+  } catch (error) {
+    showFormError(form, 'Fehler beim Aendern des Passworts');
+  }
+}
+
+async function handleChangeEmail(event) {
+  event.preventDefault();
+  const form = event.target;
+
+  const password = form.password.value;
+  const newEmail = form.newEmail.value;
+
+  try {
+    const result = await api.post('/api/auth/change-email', { password, newEmail });
+    if (result.success) {
+      showFormSuccess(form, 'E-Mail erfolgreich geaendert');
+      // Update stored user data
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      user.email = newEmail;
+      localStorage.setItem('user', JSON.stringify(user));
+      // Refresh page to update sidebar
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showFormError(form, result.error || 'Fehler beim Aendern der E-Mail');
+    }
+  } catch (error) {
+    showFormError(form, 'Fehler beim Aendern der E-Mail');
+  }
+}
+
+async function handleSystemSettings(event) {
+  event.preventDefault();
+  const form = event.target;
+
+  try {
+    const result = await api.patch('/api/settings', {
+      system_name: form.system_name.value,
+      logo_path: form.logo_path.value || '',
+    });
+
+    if (result.success) {
+      showFormSuccess(form, 'System-Einstellungen gespeichert');
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showFormError(form, result.error || 'Fehler beim Speichern');
+    }
+  } catch (error) {
+    showFormError(form, 'Fehler beim Speichern');
+  }
+}
+
+async function handleThemeColors(event) {
+  event.preventDefault();
+  const form = event.target;
+
+  try {
+    const result = await api.patch('/api/settings', {
+      primary_color: form.primary_color.value,
+      secondary_color: form.secondary_color.value,
+      success_color: form.success_color.value,
+      warning_color: form.warning_color.value,
+      error_color: form.error_color.value,
+    });
+
+    if (result.success) {
+      showFormSuccess(form, 'Farben gespeichert');
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showFormError(form, result.error || 'Fehler beim Speichern');
+    }
+  } catch (error) {
+    showFormError(form, 'Fehler beim Speichern');
+  }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-  // Update nav based on login state
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-
   // Handle logout (desktop sidebar + mobile bottom nav)
-  document.querySelectorAll('#logout-btn, #logout-btn-mobile').forEach(btn => {
+  document.querySelectorAll('#logout-btn, #logout-btn-mobile, #settings-logout-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       logout();
     });
   });
+
+  // Theme toggles (settings page, sidebar, mobile header)
+  document.querySelectorAll('#theme-toggle, #sidebar-theme-toggle, #mobile-theme-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const current = getTheme();
+      const newTheme = current === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+      updateThemeLabels(newTheme);
+    });
+  });
+
+  // Set initial theme label
+  updateThemeLabels(getTheme());
+
+  // Color input live hex display
+  document.querySelectorAll('.color-input-row input[type="color"]').forEach(input => {
+    input.addEventListener('input', () => {
+      const hex = input.parentElement.querySelector('.color-hex');
+      if (hex) hex.textContent = input.value;
+    });
+  });
+
+  // Reset colors button
+  const resetColorsBtn = document.getElementById('reset-colors-btn');
+  if (resetColorsBtn) {
+    resetColorsBtn.addEventListener('click', async () => {
+      if (!confirm('Alle Farben auf Standard zuruecksetzen?')) return;
+      try {
+        const result = await api.post('/api/settings/reset');
+        if (result.success) {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Reset error:', error);
+      }
+    });
+  }
 
   // Handle forms with data-form attribute
   document.querySelectorAll('form[data-form]').forEach(form => {
@@ -280,6 +444,18 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       case 'create-ticket':
         form.addEventListener('submit', handleCreateTicket);
+        break;
+      case 'change-password':
+        form.addEventListener('submit', handleChangePassword);
+        break;
+      case 'change-email':
+        form.addEventListener('submit', handleChangeEmail);
+        break;
+      case 'system-settings':
+        form.addEventListener('submit', handleSystemSettings);
+        break;
+      case 'theme-colors':
+        form.addEventListener('submit', handleThemeColors);
         break;
     }
   });

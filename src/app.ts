@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 import { config } from './config.js';
 import routes from './routes/index.js';
 import frontendRoutes from './routes/frontend.routes.js';
@@ -24,12 +25,30 @@ export function createApp() {
   }));
   app.use(cors());
 
-  // Rate limiting
+  // Rate limiting (only for unauthenticated users)
   app.use(
     rateLimit({
       windowMs: config.rateLimit.windowMs,
       max: config.rateLimit.max,
       message: { success: false, error: 'Too many requests, please try again later' },
+      skip: (req) => {
+        // Check Authorization header
+        let token = req.headers.authorization?.startsWith('Bearer ')
+          ? req.headers.authorization.substring(7)
+          : undefined;
+        // Check cookie (no cookie-parser needed)
+        if (!token && req.headers.cookie) {
+          const match = req.headers.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+          if (match) token = match[1];
+        }
+        if (!token) return false;
+        try {
+          jwt.verify(token, config.jwtSecret);
+          return true;
+        } catch {
+          return false;
+        }
+      },
     })
   );
 

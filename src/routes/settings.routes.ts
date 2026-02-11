@@ -8,9 +8,15 @@ import type { ApiResponse, UpdateSettingsRequest } from '../types/index.js';
 const router = Router();
 
 // Validation schema for updating settings
+const hexColorRegex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+
 const updateSettingsSchema = z.object({
   system_name: z.string().min(1).max(100).optional(),
-  primary_color: z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, 'Invalid hex color').optional(),
+  primary_color: z.string().regex(hexColorRegex, 'Invalid hex color').optional(),
+  secondary_color: z.string().regex(hexColorRegex, 'Invalid hex color').optional(),
+  success_color: z.string().regex(hexColorRegex, 'Invalid hex color').optional(),
+  warning_color: z.string().regex(hexColorRegex, 'Invalid hex color').optional(),
+  error_color: z.string().regex(hexColorRegex, 'Invalid hex color').optional(),
   logo_path: z.string().max(500).optional(),
   default_statuses: z.string().max(500).optional(),
 }).refine(data => Object.keys(data).length > 0, {
@@ -25,7 +31,7 @@ router.get('/', (_req: Request, res: Response<ApiResponse<AppSettings>>) => {
 
 // GET /api/settings/:key - Get a single setting (public)
 router.get('/:key', (req: Request<{ key: string }>, res: Response<ApiResponse<{ key: string; value: string }>>) => {
-  const validKeys: SettingKey[] = ['system_name', 'primary_color', 'logo_path', 'default_statuses'];
+  const validKeys: SettingKey[] = ['system_name', 'primary_color', 'secondary_color', 'success_color', 'warning_color', 'error_color', 'logo_path', 'default_statuses'];
 
   if (!validKeys.includes(req.params.key as SettingKey)) {
     res.status(400).json({ success: false, error: 'Invalid setting key' });
@@ -81,7 +87,7 @@ router.post(
   authenticate,
   requireAdmin,
   (req: Request<{ key: string }>, res: Response<ApiResponse<{ key: string; value: string }>>) => {
-    const validKeys: SettingKey[] = ['system_name', 'primary_color', 'logo_path', 'default_statuses'];
+    const validKeys: SettingKey[] = ['system_name', 'primary_color', 'secondary_color', 'success_color', 'warning_color', 'error_color', 'logo_path', 'default_statuses'];
 
     if (!validKeys.includes(req.params.key as SettingKey)) {
       res.status(400).json({ success: false, error: 'Invalid setting key' });

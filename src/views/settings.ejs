@@ -1,0 +1,132 @@
+<%- include('partials/header') %>
+
+<div class="settings-page">
+  <div class="page-header">
+    <h1>Einstellungen</h1>
+  </div>
+
+  <!-- Passwort aendern -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title">Passwort &auml;ndern</h2>
+    <form id="change-password-form" data-form="change-password">
+      <div class="form-group">
+        <label for="currentPassword">Aktuelles Passwort</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Neues Passwort</label>
+        <input type="password" id="newPassword" name="newPassword" required minlength="4">
+      </div>
+      <div class="form-group">
+        <label for="confirmNewPassword">Neues Passwort best&auml;tigen</label>
+        <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Passwort &auml;ndern</button>
+    </form>
+  </div>
+
+  <!-- E-Mail aendern -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title">E-Mail &auml;ndern</h2>
+    <p class="settings-current-value">Aktuelle E-Mail: <strong><%= user.email %></strong></p>
+    <form id="change-email-form" data-form="change-email">
+      <div class="form-group">
+        <label for="emailPassword">Passwort</label>
+        <input type="password" id="emailPassword" name="password" required>
+      </div>
+      <div class="form-group">
+        <label for="newEmail">Neue E-Mail</label>
+        <input type="email" id="newEmail" name="newEmail" required>
+      </div>
+      <button type="submit" class="btn btn-primary">E-Mail &auml;ndern</button>
+    </form>
+  </div>
+
+  <% if (user.role === 'admin') { %>
+  <!-- System-Einstellungen (Admin) -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title">System</h2>
+    <form id="system-settings-form" data-form="system-settings">
+      <div class="form-group">
+        <label for="systemName">System-Name</label>
+        <input type="text" id="systemName" name="system_name" value="<%= allSettings.system_name %>" placeholder="Bugio">
+      </div>
+      <div class="form-group">
+        <label for="logoPath">Logo URL (optional)</label>
+        <input type="text" id="logoPath" name="logo_path" value="<%= allSettings.logo_path %>" placeholder="/img/logo.png oder https://...">
+      </div>
+      <button type="submit" class="btn btn-primary">Speichern</button>
+    </form>
+  </div>
+
+  <!-- Theme-Farben (Admin) -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title">Theme-Farben</h2>
+    <form id="theme-colors-form" data-form="theme-colors">
+      <div class="color-grid">
+        <div class="color-item">
+          <label for="primaryColor">Primary</label>
+          <div class="color-input-row">
+            <input type="color" id="primaryColor" name="primary_color" value="<%= allSettings.primary_color %>">
+            <span class="color-hex"><%= allSettings.primary_color %></span>
+          </div>
+        </div>
+        <div class="color-item">
+          <label for="secondaryColor">Secondary</label>
+          <div class="color-input-row">
+            <input type="color" id="secondaryColor" name="secondary_color" value="<%= allSettings.secondary_color %>">
+            <span class="color-hex"><%= allSettings.secondary_color %></span>
+          </div>
+        </div>
+        <div class="color-item">
+          <label for="successColor">Success</label>
+          <div class="color-input-row">
+            <input type="color" id="successColor" name="success_color" value="<%= allSettings.success_color %>">
+            <span class="color-hex"><%= allSettings.success_color %></span>
+          </div>
+        </div>
+        <div class="color-item">
+          <label for="warningColor">Warning</label>
+          <div class="color-input-row">
+            <input type="color" id="warningColor" name="warning_color" value="<%= allSettings.warning_color %>">
+            <span class="color-hex"><%= allSettings.warning_color %></span>
+          </div>
+        </div>
+        <div class="color-item">
+          <label for="errorColor">Error</label>
+          <div class="color-input-row">
+            <input type="color" id="errorColor" name="error_color" value="<%= allSettings.error_color %>">
+            <span class="color-hex"><%= allSettings.error_color %></span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-actions">
+        <button type="submit" class="btn btn-primary">Farben speichern</button>
+        <button type="button" class="btn btn-secondary" id="reset-colors-btn">Zur&uuml;cksetzen</button>
+      </div>
+    </form>
+  </div>
+  <% } %>
+
+  <!-- App-Informationen -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title">App-Informationen</h2>
+    <div class="app-info-grid">
+      <div class="app-info-item">
+        <span class="app-info-label">Version</span>
+        <span class="app-info-value">1.0.1</span>
+      </div>
+      <div class="app-info-item">
+        <span class="app-info-label">Lizenz</span>
+        <span class="app-info-value">MIT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abmelden -->
+  <div class="settings-card card">
+    <button type="button" id="settings-logout-btn" class="btn btn-danger btn-full">Abmelden</button>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

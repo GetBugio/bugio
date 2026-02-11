@@ -69,6 +69,48 @@ export class AuthService {
     return user ? this.toSafeUser(user) : null;
   }
 
+  // Change password
+  async changePassword(userId: number, currentPassword: string, newPassword: string): Promise<void> {
+    const db = getDatabase();
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as User | undefined;
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const valid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!valid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    const newHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(newHash, userId);
+  }
+
+  // Change email
+  async changeEmail(userId: number, password: string, newEmail: string): Promise<SafeUser> {
+    const db = getDatabase();
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as User | undefined;
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) {
+      throw new Error('Password is incorrect');
+    }
+
+    const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(newEmail, userId);
+    if (existing) {
+      throw new Error('Email already in use');
+    }
+
+    db.prepare('UPDATE users SET email = ? WHERE id = ?').run(newEmail, userId);
+    const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as User;
+    return this.toSafeUser(updated);
+  }
+
   // Convert User to SafeUser (without password hash)
   private toSafeUser(user: User): SafeUser {
     return {

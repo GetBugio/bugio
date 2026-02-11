@@ -5,6 +5,10 @@ import type { Setting } from '../types/index.js';
 export type SettingKey =
   | 'system_name'
   | 'primary_color'
+  | 'secondary_color'
+  | 'success_color'
+  | 'warning_color'
+  | 'error_color'
   | 'logo_path'
   | 'default_statuses';
 
@@ -12,6 +16,10 @@ export type SettingKey =
 export interface AppSettings {
   system_name: string;
   primary_color: string;
+  secondary_color: string;
+  success_color: string;
+  warning_color: string;
+  error_color: string;
   logo_path: string;
   default_statuses: string;
 }
@@ -20,6 +28,10 @@ export interface AppSettings {
 const DEFAULT_SETTINGS: AppSettings = {
   system_name: 'Bugio',
   primary_color: '#3b82f6',
+  secondary_color: '#8b5cf6',
+  success_color: '#22c55e',
+  warning_color: '#f59e0b',
+  error_color: '#ef4444',
   logo_path: '',
   default_statuses: 'open,in_review,in_progress,rejected,completed',
 };
