@@ -22,6 +22,7 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY public/ ./public/
 COPY src/views/ ./src/views/
+COPY src/locales/ ./src/locales/
 
 # db:init needs tsx (runs once at startup via entrypoint)
 RUN npm i tsx
