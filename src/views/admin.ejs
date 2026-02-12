@@ -1,44 +1,44 @@
 <%- include('partials/header') %>
 
 <div class="page-header">
-  <h1>Admin Dashboard</h1>
+  <h1><%= t('admin.title') %></h1>
 </div>
 
 <div class="admin-grid">
   <div class="stat-card">
     <div class="stat-value"><%= stats.totalTickets %></div>
-    <div class="stat-label">Total Tickets</div>
+    <div class="stat-label"><%= t('admin.totalTickets') %></div>
   </div>
   <div class="stat-card">
     <div class="stat-value"><%= stats.openTickets %></div>
-    <div class="stat-label">Open</div>
+    <div class="stat-label"><%= t('admin.open') %></div>
   </div>
   <div class="stat-card">
     <div class="stat-value"><%= stats.inProgressTickets %></div>
-    <div class="stat-label">In Progress</div>
+    <div class="stat-label"><%= t('admin.inProgress') %></div>
   </div>
   <div class="stat-card">
     <div class="stat-value"><%= stats.completedTickets %></div>
-    <div class="stat-label">Completed</div>
+    <div class="stat-label"><%= t('admin.completed') %></div>
   </div>
   <div class="stat-card">
     <div class="stat-value"><%= stats.totalUsers %></div>
-    <div class="stat-label">Users</div>
+    <div class="stat-label"><%= t('admin.users') %></div>
   </div>
 </div>
 
 <div class="card" style="margin-bottom: 2rem;">
-  <h2>Recent Tickets</h2>
+  <h2><%= t('admin.recentTickets') %></h2>
   <table class="admin-table" style="margin-top: 1rem;">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Type</th>
-        <th>Status</th>
-        <th>Votes</th>
-        <th>Created</th>
-        <th>Actions</th>
+        <th><%= t('admin.id') %></th>
+        <th><%= t('admin.titleCol') %></th>
+        <th><%= t('admin.type') %></th>
+        <th><%= t('admin.status') %></th>
+        <th><%= t('admin.votes') %></th>
+        <th><%= t('admin.created') %></th>
+        <th><%= t('admin.actions') %></th>
       </tr>
     </thead>
     <tbody>
@@ -49,16 +49,16 @@
           <td><span class="tag tag-<%= ticket.tag %>"><%= ticket.tag %></span></td>
           <td>
             <select onchange="handleStatusChange(<%= ticket.id %>, this.value)" style="padding: 0.25rem;">
-              <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
-              <option value="in_review" <%= ticket.status === 'in_review' ? 'selected' : '' %>>In Review</option>
-              <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>>In Progress</option>
-              <option value="rejected" <%= ticket.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
-              <option value="completed" <%= ticket.status === 'completed' ? 'selected' : '' %>>Completed</option>
+              <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>><%= t('status.open') %></option>
+              <option value="in_review" <%= ticket.status === 'in_review' ? 'selected' : '' %>><%= t('status.in_review') %></option>
+              <option value="in_progress" <%= ticket.status === 'in_progress' ? 'selected' : '' %>><%= t('status.in_progress') %></option>
+              <option value="rejected" <%= ticket.status === 'rejected' ? 'selected' : '' %>><%= t('status.rejected') %></option>
+              <option value="completed" <%= ticket.status === 'completed' ? 'selected' : '' %>><%= t('status.completed') %></option>
             </select>
           </td>
           <td><%= ticket.voteCount %></td>
           <td><%= new Date(ticket.createdAt).toLocaleDateString() %></td>
-          <td><a href="/ticket/<%= ticket.id %>" class="btn btn-small btn-secondary">View</a></td>
+          <td><a href="/ticket/<%= ticket.id %>" class="btn btn-small btn-secondary"><%= t('common.view') %></a></td>
         </tr>
       <% }) %>
     </tbody>

@@ -6,24 +6,24 @@
       <img src="/logo-icon.svg" alt="BugIO">
     </div>
     <h1><%= settings.systemName || 'BugIO' %></h1>
-    <p class="auth-subtitle">Login to your account</p>
+    <p class="auth-subtitle"><%= t('login.subtitle') %></p>
 
     <form data-form="login">
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required placeholder="your@email.com">
+        <label for="email"><%= t('login.email') %></label>
+        <input type="email" id="email" name="email" required placeholder="<%= t('login.emailPlaceholder') %>">
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required placeholder="Your password">
+        <label for="password"><%= t('login.password') %></label>
+        <input type="password" id="password" name="password" required placeholder="<%= t('login.passwordPlaceholder') %>">
       </div>
 
-      <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+      <button type="submit" class="btn btn-primary" style="width: 100%;"><%= t('login.submit') %></button>
     </form>
 
     <div class="auth-links">
-      Don't have an account? <a href="/register">Register</a>
+      <%= t('login.noAccount') %> <a href="/register"><%= t('login.register') %></a>
     </div>
   </div>
 </div>

@@ -1140,6 +1140,79 @@ html:not(.light) .theme-switch-thumb {
 }
 
 /* ===========================
+   Language Switcher
+   =========================== */
+.lang-switcher {
+  position: relative;
+}
+
+.lang-switcher-btn {
+  cursor: pointer;
+}
+
+.lang-flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  z-index: 100;
+  margin-bottom: 0.25rem;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.lang-dropdown.open {
+  display: block;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.lang-option:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.lang-option.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Mobile header lang switcher */
+.mobile-header .lang-switcher .lang-dropdown {
+  left: auto;
+  right: 0;
+  min-width: 100px;
+}
+
+/* Light theme overrides for lang dropdown */
+.light .lang-dropdown {
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
    Page transition
    =========================== */
 @keyframes page-fade-in {

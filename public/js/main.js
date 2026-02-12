@@ -1,5 +1,8 @@
 // BugIO Frontend JavaScript
 
+// Translations (injected from server via window.__translations)
+const i18n = window.__translations || {};
+
 // API helper
 const api = {
   async request(method, url, data = null) {
@@ -50,11 +53,11 @@ async function handleVote(ticketId, action) {
     if (result.success) {
       window.location.reload();
     } else {
-      alert(result.error || 'Failed to update vote');
+      alert(result.error || i18n.voteFailed);
     }
   } catch (error) {
     console.error('Vote error:', error);
-    alert('Failed to update vote');
+    alert(i18n.voteFailed);
   }
 }
 
@@ -72,11 +75,11 @@ async function handleStatusChange(ticketId, newStatus) {
     if (result.success) {
       window.location.reload();
     } else {
-      alert(result.error || 'Failed to update status');
+      alert(result.error || i18n.statusFailed);
     }
   } catch (error) {
     console.error('Status change error:', error);
-    alert('Failed to update status');
+    alert(i18n.statusFailed);
   }
 }
 
@@ -88,7 +91,7 @@ async function submitComment(event, ticketId) {
   const content = form.content.value.trim();
 
   if (!content) {
-    alert('Please enter a comment');
+    alert(i18n.enterComment);
     return;
   }
 
@@ -104,17 +107,17 @@ async function submitComment(event, ticketId) {
     if (result.success) {
       window.location.reload();
     } else {
-      alert(result.error || 'Failed to add comment');
+      alert(result.error || i18n.commentFailed);
     }
   } catch (error) {
     console.error('Comment error:', error);
-    alert('Failed to add comment');
+    alert(i18n.commentFailed);
   }
 }
 
 // Delete comment (admin)
 async function deleteComment(ticketId, commentId) {
-  if (!confirm('Are you sure you want to delete this comment?')) {
+  if (!confirm(i18n.deleteCommentConfirm)) {
     return;
   }
 
@@ -124,11 +127,11 @@ async function deleteComment(ticketId, commentId) {
     if (result.success) {
       window.location.reload();
     } else {
-      alert(result.error || 'Failed to delete comment');
+      alert(result.error || i18n.deleteCommentFailed);
     }
   } catch (error) {
     console.error('Delete comment error:', error);
-    alert('Failed to delete comment');
+    alert(i18n.deleteCommentFailed);
   }
 }
 
@@ -152,11 +155,11 @@ async function handleLogin(event) {
       const redirect = params.get('redirect') || '/';
       window.location.href = redirect;
     } else {
-      showFormError(form, result.error || 'Login failed');
+      showFormError(form, result.error || i18n.loginFailed);
     }
   } catch (error) {
     console.error('Login error:', error);
-    showFormError(form, 'Login failed');
+    showFormError(form, i18n.loginFailed);
   }
 }
 
@@ -170,7 +173,7 @@ async function handleRegister(event) {
   const confirmPassword = form.confirmPassword.value;
 
   if (password !== confirmPassword) {
-    showFormError(form, 'Passwords do not match');
+    showFormError(form, i18n.passwordsMismatch);
     return;
   }
 
@@ -189,11 +192,11 @@ async function handleRegister(event) {
         window.location.href = '/login';
       }
     } else {
-      showFormError(form, result.error || 'Registration failed');
+      showFormError(form, result.error || i18n.registerFailed);
     }
   } catch (error) {
     console.error('Register error:', error);
-    showFormError(form, 'Registration failed');
+    showFormError(form, i18n.registerFailed);
   }
 }
 
@@ -219,11 +222,11 @@ async function handleCreateTicket(event) {
     if (result.success && result.data) {
       window.location.href = `/ticket/${result.data.id}`;
     } else {
-      showFormError(form, result.error || 'Failed to create ticket');
+      showFormError(form, result.error || i18n.createTicketFailed);
     }
   } catch (error) {
     console.error('Create ticket error:', error);
-    showFormError(form, 'Failed to create ticket');
+    showFormError(form, i18n.createTicketFailed);
   }
 }
 
@@ -282,6 +285,13 @@ function updateThemeLabels(theme) {
   });
 }
 
+// Language switcher
+function setLang(lang) {
+  localStorage.setItem('lang', lang);
+  document.cookie = 'lang=' + lang + '; path=/; max-age=' + (365 * 24 * 60 * 60) + '; SameSite=Lax';
+  window.location.reload();
+}
+
 // Settings form handlers
 async function handleChangePassword(event) {
   event.preventDefault();
@@ -292,25 +302,25 @@ async function handleChangePassword(event) {
   const confirmNewPassword = form.confirmNewPassword.value;
 
   if (newPassword !== confirmNewPassword) {
-    showFormError(form, 'Neue Passwoerter stimmen nicht ueberein');
+    showFormError(form, i18n.newPasswordsMismatch);
     return;
   }
 
   if (newPassword.length < 4) {
-    showFormError(form, 'Neues Passwort muss mindestens 4 Zeichen haben');
+    showFormError(form, i18n.passwordTooShort);
     return;
   }
 
   try {
     const result = await api.post('/api/auth/change-password', { currentPassword, newPassword });
     if (result.success) {
-      showFormSuccess(form, 'Passwort erfolgreich geaendert');
+      showFormSuccess(form, i18n.passwordChanged);
       form.reset();
     } else {
-      showFormError(form, result.error || 'Fehler beim Aendern des Passworts');
+      showFormError(form, result.error || i18n.passwordChangeFailed);
     }
   } catch (error) {
-    showFormError(form, 'Fehler beim Aendern des Passworts');
+    showFormError(form, i18n.passwordChangeFailed);
   }
 }
 
@@ -324,7 +334,7 @@ async function handleChangeEmail(event) {
   try {
     const result = await api.post('/api/auth/change-email', { password, newEmail });
     if (result.success) {
-      showFormSuccess(form, 'E-Mail erfolgreich geaendert');
+      showFormSuccess(form, i18n.emailChanged);
       // Update stored user data
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       user.email = newEmail;
@@ -332,10 +342,10 @@ async function handleChangeEmail(event) {
       // Refresh page to update sidebar
       setTimeout(() => window.location.reload(), 1000);
     } else {
-      showFormError(form, result.error || 'Fehler beim Aendern der E-Mail');
+      showFormError(form, result.error || i18n.emailChangeFailed);
     }
   } catch (error) {
-    showFormError(form, 'Fehler beim Aendern der E-Mail');
+    showFormError(form, i18n.emailChangeFailed);
   }
 }
 
@@ -350,13 +360,13 @@ async function handleSystemSettings(event) {
     });
 
     if (result.success) {
-      showFormSuccess(form, 'System-Einstellungen gespeichert');
+      showFormSuccess(form, i18n.settingsSaved);
       setTimeout(() => window.location.reload(), 1000);
     } else {
-      showFormError(form, result.error || 'Fehler beim Speichern');
+      showFormError(form, result.error || i18n.saveFailed);
     }
   } catch (error) {
-    showFormError(form, 'Fehler beim Speichern');
+    showFormError(form, i18n.saveFailed);
   }
 }
 
@@ -374,13 +384,13 @@ async function handleThemeColors(event) {
     });
 
     if (result.success) {
-      showFormSuccess(form, 'Farben gespeichert');
+      showFormSuccess(form, i18n.colorsSaved);
       setTimeout(() => window.location.reload(), 1000);
     } else {
-      showFormError(form, result.error || 'Fehler beim Speichern');
+      showFormError(form, result.error || i18n.saveFailed);
     }
   } catch (error) {
-    showFormError(form, 'Fehler beim Speichern');
+    showFormError(form, i18n.saveFailed);
   }
 }
 
@@ -407,6 +417,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set initial theme label
   updateThemeLabels(getTheme());
 
+  // Language switcher dropdowns
+  document.querySelectorAll('.lang-switcher-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = btn.parentElement.querySelector('.lang-dropdown');
+      dropdown.classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      setLang(opt.dataset.lang);
+    });
+  });
+
+  // Close lang dropdown on outside click
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.lang-dropdown.open').forEach(d => d.classList.remove('open'));
+  });
+
   // Color input live hex display
   document.querySelectorAll('.color-input-row input[type="color"]').forEach(input => {
     input.addEventListener('input', () => {
@@ -419,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetColorsBtn = document.getElementById('reset-colors-btn');
   if (resetColorsBtn) {
     resetColorsBtn.addEventListener('click', async () => {
-      if (!confirm('Alle Farben auf Standard zuruecksetzen?')) return;
+      if (!confirm(i18n.resetConfirm)) return;
       try {
         const result = await api.post('/api/settings/reset');
         if (result.success) {

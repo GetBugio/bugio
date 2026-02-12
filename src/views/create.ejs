@@ -1,48 +1,48 @@
 <%- include('partials/header') %>
 
 <div class="page-header">
-  <h1>Create New Ticket</h1>
+  <h1><%= t('create.title') %></h1>
 </div>
 
 <div class="card">
   <form data-form="create-ticket">
     <div class="form-group">
-      <label for="title">Title *</label>
-      <input type="text" id="title" name="title" required placeholder="Brief summary of the issue or request">
+      <label for="title"><%= t('create.titleLabel') %></label>
+      <input type="text" id="title" name="title" required placeholder="<%= t('create.titlePlaceholder') %>">
     </div>
 
     <div class="form-group">
-      <label for="tag">Type *</label>
+      <label for="tag"><%= t('create.typeLabel') %></label>
       <select id="tag" name="tag" required>
-        <option value="bug">Bug - Something isn't working</option>
-        <option value="feature">Feature - New functionality request</option>
+        <option value="bug"><%= t('create.bugOption') %></option>
+        <option value="feature"><%= t('create.featureOption') %></option>
       </select>
     </div>
 
     <div class="form-group">
-      <label for="description">Description *</label>
-      <textarea id="description" name="description" required placeholder="Provide detailed information about the bug or feature request..."></textarea>
-      <div class="form-hint">Include steps to reproduce for bugs, or expected behavior for features.</div>
+      <label for="description"><%= t('create.descriptionLabel') %></label>
+      <textarea id="description" name="description" required placeholder="<%= t('create.descriptionPlaceholder') %>"></textarea>
+      <div class="form-hint"><%= t('create.descriptionHint') %></div>
     </div>
 
     <% if (!user) { %>
       <div class="form-group">
-        <label for="email">Your Email (optional)</label>
-        <input type="email" id="email" name="email" placeholder="email@example.com">
-        <div class="form-hint">Provide your email to receive updates about this ticket. You can also submit anonymously.</div>
+        <label for="email"><%= t('create.emailLabel') %></label>
+        <input type="email" id="email" name="email" placeholder="<%= t('create.emailPlaceholder') %>">
+        <div class="form-hint"><%= t('create.emailHint') %></div>
       </div>
     <% } %>
 
     <div style="display: flex; gap: 1rem; align-items: center;">
-      <button type="submit" class="btn btn-primary">Create Ticket</button>
-      <a href="/" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary"><%= t('create.submit') %></button>
+      <a href="/" class="btn btn-secondary"><%= t('common.cancel') %></a>
     </div>
   </form>
 </div>
 
 <% if (!user) { %>
   <div class="alert alert-info" style="margin-top: 1rem;">
-    <strong>Tip:</strong> <a href="/login">Login</a> to track all your tickets and vote on others!
+    <strong><%= t('create.tip') %></strong> <a href="/login"><%= t('create.tipLink') %></a> <%= t('create.tipText') %>
   </div>
 <% } %>
 

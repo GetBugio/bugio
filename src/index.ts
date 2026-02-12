@@ -1,9 +1,13 @@
 import { createApp } from './app.js';
 import { initDatabase, closeDatabase } from './db/connection.js';
+import { initI18n } from './services/i18n.service.js';
 import { config } from './config.js';
 
 // Initialize database
 initDatabase();
+
+// Initialize translations
+initI18n();
 
 // Create and start the app
 const app = createApp();

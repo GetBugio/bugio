@@ -2,9 +2,9 @@
 
 <div class="card" style="text-align: center; padding: 3rem;">
   <h1 style="font-size: 4rem; color: var(--error); margin-bottom: 1rem;">404</h1>
-  <h2 style="margin-bottom: 1rem; color: var(--text-primary);"><%= message || 'Page Not Found' %></h2>
-  <p style="color: var(--text-disabled); margin-bottom: 2rem;">The page you're looking for doesn't exist or has been moved.</p>
-  <a href="/" class="btn btn-primary">Go to Home</a>
+  <h2 style="margin-bottom: 1rem; color: var(--text-primary);"><%= message || t('error.pageNotFound') %></h2>
+  <p style="color: var(--text-disabled); margin-bottom: 2rem;"><%= t('error.notFoundDesc') %></p>
+  <a href="/" class="btn btn-primary"><%= t('error.goHome') %></a>
 </div>
 
 <%- include('partials/footer') %>

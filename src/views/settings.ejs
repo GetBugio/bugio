@@ -2,98 +2,98 @@
 
 <div class="settings-page">
   <div class="page-header">
-    <h1>Einstellungen</h1>
+    <h1><%= t('settings.title') %></h1>
   </div>
 
-  <!-- Passwort aendern -->
+  <!-- Password -->
   <div class="settings-card card">
-    <h2 class="settings-card-title">Passwort &auml;ndern</h2>
+    <h2 class="settings-card-title"><%= t('settings.changePassword') %></h2>
     <form id="change-password-form" data-form="change-password">
       <div class="form-group">
-        <label for="currentPassword">Aktuelles Passwort</label>
+        <label for="currentPassword"><%= t('settings.currentPassword') %></label>
         <input type="password" id="currentPassword" name="currentPassword" required>
       </div>
       <div class="form-group">
-        <label for="newPassword">Neues Passwort</label>
+        <label for="newPassword"><%= t('settings.newPassword') %></label>
         <input type="password" id="newPassword" name="newPassword" required minlength="4">
       </div>
       <div class="form-group">
-        <label for="confirmNewPassword">Neues Passwort best&auml;tigen</label>
+        <label for="confirmNewPassword"><%= t('settings.confirmNewPassword') %></label>
         <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
       </div>
-      <button type="submit" class="btn btn-primary">Passwort &auml;ndern</button>
+      <button type="submit" class="btn btn-primary"><%= t('settings.changePasswordBtn') %></button>
     </form>
   </div>
 
-  <!-- E-Mail aendern -->
+  <!-- Email -->
   <div class="settings-card card">
-    <h2 class="settings-card-title">E-Mail &auml;ndern</h2>
-    <p class="settings-current-value">Aktuelle E-Mail: <strong><%= user.email %></strong></p>
+    <h2 class="settings-card-title"><%= t('settings.changeEmail') %></h2>
+    <p class="settings-current-value"><%= t('settings.currentEmail') %> <strong><%= user.email %></strong></p>
     <form id="change-email-form" data-form="change-email">
       <div class="form-group">
-        <label for="emailPassword">Passwort</label>
+        <label for="emailPassword"><%= t('settings.passwordLabel') %></label>
         <input type="password" id="emailPassword" name="password" required>
       </div>
       <div class="form-group">
-        <label for="newEmail">Neue E-Mail</label>
+        <label for="newEmail"><%= t('settings.newEmail') %></label>
         <input type="email" id="newEmail" name="newEmail" required>
       </div>
-      <button type="submit" class="btn btn-primary">E-Mail &auml;ndern</button>
+      <button type="submit" class="btn btn-primary"><%= t('settings.changeEmailBtn') %></button>
     </form>
   </div>
 
   <% if (user.role === 'admin') { %>
-  <!-- System-Einstellungen (Admin) -->
+  <!-- System Settings (Admin) -->
   <div class="settings-card card">
-    <h2 class="settings-card-title">System</h2>
+    <h2 class="settings-card-title"><%= t('settings.system') %></h2>
     <form id="system-settings-form" data-form="system-settings">
       <div class="form-group">
-        <label for="systemName">System-Name</label>
-        <input type="text" id="systemName" name="system_name" value="<%= allSettings.system_name %>" placeholder="Bugio">
+        <label for="systemName"><%= t('settings.systemName') %></label>
+        <input type="text" id="systemName" name="system_name" value="<%= allSettings.system_name %>" placeholder="<%= t('settings.systemNamePlaceholder') %>">
       </div>
       <div class="form-group">
-        <label for="logoPath">Logo URL (optional)</label>
-        <input type="text" id="logoPath" name="logo_path" value="<%= allSettings.logo_path %>" placeholder="/img/logo.png oder https://...">
+        <label for="logoPath"><%= t('settings.logoUrl') %></label>
+        <input type="text" id="logoPath" name="logo_path" value="<%= allSettings.logo_path %>" placeholder="<%= t('settings.logoPlaceholder') %>">
       </div>
-      <button type="submit" class="btn btn-primary">Speichern</button>
+      <button type="submit" class="btn btn-primary"><%= t('common.save') %></button>
     </form>
   </div>
 
-  <!-- Theme-Farben (Admin) -->
+  <!-- Theme Colors (Admin) -->
   <div class="settings-card card">
-    <h2 class="settings-card-title">Theme-Farben</h2>
+    <h2 class="settings-card-title"><%= t('settings.themeColors') %></h2>
     <form id="theme-colors-form" data-form="theme-colors">
       <div class="color-grid">
         <div class="color-item">
-          <label for="primaryColor">Primary</label>
+          <label for="primaryColor"><%= t('settings.primary') %></label>
           <div class="color-input-row">
             <input type="color" id="primaryColor" name="primary_color" value="<%= allSettings.primary_color %>">
             <span class="color-hex"><%= allSettings.primary_color %></span>
           </div>
         </div>
         <div class="color-item">
-          <label for="secondaryColor">Secondary</label>
+          <label for="secondaryColor"><%= t('settings.secondary') %></label>
           <div class="color-input-row">
             <input type="color" id="secondaryColor" name="secondary_color" value="<%= allSettings.secondary_color %>">
             <span class="color-hex"><%= allSettings.secondary_color %></span>
           </div>
         </div>
         <div class="color-item">
-          <label for="successColor">Success</label>
+          <label for="successColor"><%= t('settings.success') %></label>
           <div class="color-input-row">
             <input type="color" id="successColor" name="success_color" value="<%= allSettings.success_color %>">
             <span class="color-hex"><%= allSettings.success_color %></span>
           </div>
         </div>
         <div class="color-item">
-          <label for="warningColor">Warning</label>
+          <label for="warningColor"><%= t('settings.warning') %></label>
           <div class="color-input-row">
             <input type="color" id="warningColor" name="warning_color" value="<%= allSettings.warning_color %>">
             <span class="color-hex"><%= allSettings.warning_color %></span>
           </div>
         </div>
         <div class="color-item">
-          <label for="errorColor">Error</label>
+          <label for="errorColor"><%= t('settings.error') %></label>
           <div class="color-input-row">
             <input type="color" id="errorColor" name="error_color" value="<%= allSettings.error_color %>">
             <span class="color-hex"><%= allSettings.error_color %></span>
@@ -101,31 +101,31 @@
         </div>
       </div>
       <div class="settings-actions">
-        <button type="submit" class="btn btn-primary">Farben speichern</button>
-        <button type="button" class="btn btn-secondary" id="reset-colors-btn">Zur&uuml;cksetzen</button>
+        <button type="submit" class="btn btn-primary"><%= t('settings.saveColors') %></button>
+        <button type="button" class="btn btn-secondary" id="reset-colors-btn"><%= t('common.reset') %></button>
       </div>
     </form>
   </div>
   <% } %>
 
-  <!-- App-Informationen -->
+  <!-- App Info -->
   <div class="settings-card card">
-    <h2 class="settings-card-title">App-Informationen</h2>
+    <h2 class="settings-card-title"><%= t('settings.appInfo') %></h2>
     <div class="app-info-grid">
       <div class="app-info-item">
-        <span class="app-info-label">Version</span>
+        <span class="app-info-label"><%= t('settings.version') %></span>
         <span class="app-info-value">1.0.1</span>
       </div>
       <div class="app-info-item">
-        <span class="app-info-label">Lizenz</span>
+        <span class="app-info-label"><%= t('settings.license') %></span>
         <span class="app-info-value">MIT</span>
       </div>
     </div>
   </div>
 
-  <!-- Abmelden -->
+  <!-- Logout -->
   <div class="settings-card card">
-    <button type="button" id="settings-logout-btn" class="btn btn-danger btn-full">Abmelden</button>
+    <button type="button" id="settings-logout-btn" class="btn btn-danger btn-full"><%= t('settings.logoutBtn') %></button>
   </div>
 </div>
 

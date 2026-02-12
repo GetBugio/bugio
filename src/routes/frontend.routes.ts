@@ -4,6 +4,7 @@ import { config } from '../config.js';
 import { ticketService } from '../services/ticket.service.js';
 import { settingsService } from '../services/settings.service.js';
 import { getDatabase } from '../db/connection.js';
+import { getT, getJsTranslations, parseLangFromCookie } from '../services/i18n.service.js';
 import type { User, TicketTag, TicketStatus, TicketQueryParams } from '../types/index.js';
 
 const router = Router();
@@ -58,6 +59,9 @@ function getUserFromRequest(req: Request): User | null {
 function getCommonViewData(req: Request) {
   const settings = settingsService.getAll();
   const user = getUserFromRequest(req);
+  const lang = parseLangFromCookie(req.headers.cookie);
+  const t = getT(lang);
+  const jsTranslations = JSON.stringify(getJsTranslations(lang));
 
   return {
     settings: {
@@ -70,6 +74,9 @@ function getCommonViewData(req: Request) {
       logoPath: settings.logo_path,
     },
     user,
+    t,
+    lang,
+    jsTranslations,
   };
 }
 
@@ -98,16 +105,16 @@ router.get('/', (req: Request, res: Response) => {
   const { tickets: rawTickets, total } = ticketService.list(queryParams, common.user?.id);
 
   // Transform tickets for frontend
-  const tickets = rawTickets.map(t => ({
-    id: t.id,
-    title: t.title,
-    description: t.description,
-    tag: t.tag,
-    status: t.status,
-    createdAt: t.created_at,
-    creatorEmail: t.author_name || t.author_email,
-    voteCount: t.vote_count,
-    hasVoted: t.user_has_voted,
+  const tickets = rawTickets.map(tk => ({
+    id: tk.id,
+    title: tk.title,
+    description: tk.description,
+    tag: tk.tag,
+    status: tk.status,
+    createdAt: tk.created_at,
+    creatorEmail: tk.author_name || tk.author_email,
+    voteCount: tk.vote_count,
+    hasVoted: tk.user_has_voted,
     commentCount: 0, // TODO: add comment count to query
   }));
 
@@ -115,7 +122,7 @@ router.get('/', (req: Request, res: Response) => {
 
   res.render('index', {
     ...common,
-    title: 'Tickets',
+    title: common.t('tickets.title'),
     tickets,
     pagination: { page, totalPages, total },
     query: { tag: tagRaw, status: statusRaw, sortBy: sortBy || 'createdAt', search },
@@ -128,7 +135,7 @@ router.get('/create', (req: Request, res: Response) => {
 
   res.render('create', {
     ...common,
-    title: 'Create Ticket',
+    title: common.t('create.title'),
   });
 });
 
@@ -141,8 +148,8 @@ router.get('/ticket/:id', (req: Request, res: Response) => {
   if (isNaN(ticketId)) {
     return res.status(404).render('error', {
       ...common,
-      title: 'Not Found',
-      message: 'Ticket not found',
+      title: common.t('error.pageNotFound'),
+      message: common.t('error.pageNotFound'),
     });
   }
 
@@ -151,8 +158,8 @@ router.get('/ticket/:id', (req: Request, res: Response) => {
   if (!rawTicket) {
     return res.status(404).render('error', {
       ...common,
-      title: 'Not Found',
-      message: 'Ticket not found',
+      title: common.t('error.pageNotFound'),
+      message: common.t('error.pageNotFound'),
     });
   }
 
@@ -210,7 +217,7 @@ router.get('/login', (req: Request, res: Response) => {
 
   res.render('login', {
     ...common,
-    title: 'Login',
+    title: common.t('nav.login'),
   });
 });
 
@@ -224,7 +231,7 @@ router.get('/register', (req: Request, res: Response) => {
 
   res.render('register', {
     ...common,
-    title: 'Register',
+    title: common.t('nav.register'),
   });
 });
 
@@ -254,18 +261,18 @@ router.get('/admin', (req: Request, res: Response) => {
   // Get recent tickets
   const { tickets: rawTickets } = ticketService.list({ page: 1, limit: 10, sort: 'created_at', order: 'desc' }, common.user.id);
 
-  const recentTickets = rawTickets.map(t => ({
-    id: t.id,
-    title: t.title,
-    tag: t.tag,
-    status: t.status,
-    createdAt: t.created_at,
-    voteCount: t.vote_count,
+  const recentTickets = rawTickets.map(tk => ({
+    id: tk.id,
+    title: tk.title,
+    tag: tk.tag,
+    status: tk.status,
+    createdAt: tk.created_at,
+    voteCount: tk.vote_count,
   }));
 
   res.render('admin', {
     ...common,
-    title: 'Admin Dashboard',
+    title: common.t('admin.title'),
     stats: {
       totalTickets,
       openTickets,
@@ -289,7 +296,7 @@ router.get('/settings', (req: Request, res: Response) => {
 
   res.render('settings', {
     ...common,
-    title: 'Einstellungen',
+    title: common.t('settings.title'),
     allSettings,
   });
 });
