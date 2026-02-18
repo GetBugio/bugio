@@ -32,14 +32,24 @@ export function getAnonymousTicketCount(ip: string): number {
 
 // Authenticate JWT token (required)
 export function authenticate(req: Request, res: Response<ApiResponse>, next: NextFunction): void {
-  const authHeader = req.headers.authorization;
+  let token: string | undefined;
 
-  if (!authHeader?.startsWith('Bearer ')) {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  } else {
+    // Fallback: read token from cookie (sent automatically with credentials: 'same-origin')
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader) {
+      const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+      if (match) token = match[1];
+    }
+  }
+
+  if (!token) {
     res.status(401).json({ success: false, error: 'Authentication required' });
     return;
   }
-
-  const token = authHeader.substring(7);
 
   try {
     const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;

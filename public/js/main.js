@@ -3,6 +3,14 @@
 // Translations (injected from server via window.__translations)
 const i18n = window.__translations || {};
 
+// Get auth token from localStorage or cookie (fallback)
+function getToken() {
+  const lsToken = localStorage.getItem('token');
+  if (lsToken) return lsToken;
+  const match = document.cookie.split(';').map(c => c.trim()).find(c => c.startsWith('token='));
+  return match ? match.substring(6) : null;
+}
+
 // API helper
 const api = {
   async request(method, url, data = null) {
@@ -15,7 +23,7 @@ const api = {
     };
 
     // Add auth token if present
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (token) {
       options.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -36,7 +44,7 @@ const api = {
 
 // Vote handling
 async function handleVote(ticketId, action) {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (!token) {
     window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
     return;
@@ -63,7 +71,7 @@ async function handleVote(ticketId, action) {
 
 // Status change handling (admin)
 async function handleStatusChange(ticketId, newStatus) {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (!token) {
     window.location.href = '/login';
     return;
@@ -95,7 +103,7 @@ async function submitComment(event, ticketId) {
     return;
   }
 
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (!token) {
     window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
     return;
