@@ -230,7 +230,7 @@ async function handleCreateTicket(event) {
     if (result.success && result.data) {
       window.location.href = `/ticket/${result.data.id}`;
     } else {
-      showFormError(form, result.error || i18n.createTicketFailed);
+      showFormError(form, result.message || result.error || i18n.createTicketFailed);
     }
   } catch (error) {
     console.error('Create ticket error:', error);
@@ -468,6 +468,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Vote buttons on ticket detail page
+  document.querySelectorAll('[data-action="vote"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ticketId = btn.dataset.ticketId;
+      const hasVoted = btn.dataset.voted === 'true';
+      handleVote(ticketId, hasVoted ? 'remove' : 'add');
+    });
+  });
+
+  // Status change form
+  document.querySelectorAll('form[data-action="status-change"]').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleStatusChange(form.dataset.ticketId, form.status.value);
+    });
+  });
+
+  // Comment form
+  document.querySelectorAll('form[data-action="comment"]').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      submitComment(e, form.dataset.ticketId);
+    });
+  });
+
+  // Delete comment buttons
+  document.querySelectorAll('[data-action="delete-comment"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      deleteComment(btn.dataset.ticketId, btn.dataset.commentId);
+    });
+  });
 
   // Handle forms with data-form attribute
   document.querySelectorAll('form[data-form]').forEach(form => {
