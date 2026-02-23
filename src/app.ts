@@ -99,25 +99,21 @@ export function createApp() {
     tenantSubRouter.use('/api', apiRoutes);
     tenantSubRouter.use('/', frontendRoutes);
 
-    // Minimal router for the base domain: registration + billing webhook (LP is served by web_bugio)
+    // Base domain router: registration + billing webhook + platform admin at /admin
     const baseRouter = express.Router();
     baseRouter.use('/api/register', registrationRoutes);
     baseRouter.use('/api/billing', billingRoutes);
     baseRouter.use('/api/health', (_req, res) => res.json({ success: true, data: { status: 'healthy', mode: config.mode } }));
+    baseRouter.use('/admin', adminSubRouter);
     baseRouter.use('/', (_req, res) => res.status(404).json({ success: false, error: 'Not found' }));
 
     app.use((req, res, next) => {
       const host = req.hostname.split(':')[0];
       const base = config.baseDomain;
 
-      // Base domain: getbugio.com or www.getbugio.com → registration API only
+      // Base domain: getbugio.com or www.getbugio.com → registration + platform admin
       if (host === base || host === `www.${base}`) {
         return baseRouter(req, res, next);
-      }
-
-      // admin.getbugio.com
-      if (host === `admin.${base}`) {
-        return adminSubRouter(req, res, next);
       }
 
       // {tenant}.getbugio.com - wrap in tenant context + trial guard

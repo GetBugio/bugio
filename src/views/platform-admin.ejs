@@ -178,14 +178,14 @@
     const token = document.getElementById('admin-token').value;
     const err = document.getElementById('login-error');
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/admin/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
       const data = await res.json();
       if (data.success) {
-        location.href = '/';
+        location.href = '/admin';
       } else {
         err.textContent = data.error || 'Invalid token';
         err.style.display = 'block';
@@ -210,7 +210,7 @@
   });
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await fetch('/api/logout', { method: 'POST' });
+    await fetch('/admin/api/logout', { method: 'POST' });
     location.reload();
   });
 
@@ -221,7 +221,7 @@
   // Load stats
   async function loadStats() {
     try {
-      const res = await fetch('/api/stats');
+      const res = await fetch('/admin/api/stats');
       const data = await res.json();
       if (data.success) {
         const s = data.data;
@@ -237,7 +237,7 @@
   // Load tenants
   async function loadTenants() {
     try {
-      const res = await fetch('/api/tenants');
+      const res = await fetch('/admin/api/tenants');
       const data = await res.json();
       if (!data.success) return;
       const tbody = document.getElementById('tenants-tbody');
@@ -264,7 +264,7 @@
 
   async function setTenantStatus(name, status) {
     if (!status) return;
-    await fetch('/api/tenants/' + name, {
+    await fetch('/admin/api/tenants/' + name, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -276,7 +276,7 @@
   // Load coupons
   async function loadCoupons() {
     try {
-      const res = await fetch('/api/coupons');
+      const res = await fetch('/admin/api/coupons');
       const data = await res.json();
       if (!data.success) return;
       const tbody = document.getElementById('coupons-tbody');
@@ -304,7 +304,7 @@
     const suc = document.getElementById('coupons-success');
 
     try {
-      const res = await fetch('/api/coupons', {
+      const res = await fetch('/admin/api/coupons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, type, value, maxUses, expiresAt }),
@@ -328,7 +328,7 @@
 
   async function deleteCoupon(code) {
     if (!confirm('Delete coupon ' + code + '?')) return;
-    await fetch('/api/coupons/' + code, { method: 'DELETE' });
+    await fetch('/admin/api/coupons/' + code, { method: 'DELETE' });
     loadCoupons();
   }
 
@@ -337,7 +337,7 @@
     const el = document.getElementById('diagnose-result');
     el.textContent = 'Running...';
     try {
-      const res = await fetch('/api/diagnose');
+      const res = await fetch('/admin/api/diagnose');
       const data = await res.json();
       el.textContent = JSON.stringify(data.data, null, 2);
     } catch {
@@ -348,7 +348,7 @@
   async function runCleanup() {
     if (!confirm('Cleanup orphaned tenants?')) return;
     try {
-      const res = await fetch('/api/cleanup', { method: 'POST' });
+      const res = await fetch('/admin/api/cleanup', { method: 'POST' });
       const data = await res.json();
       alert('Cleaned up: ' + (data.data?.orphaned?.join(', ') || 'none'));
       loadDiagnose();

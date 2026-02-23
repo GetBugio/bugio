@@ -108,8 +108,8 @@
   </div>
   <% } %>
 
-  <% if (typeof config !== 'undefined' && config.isCloudhosted) { %>
-  <!-- Billing Section (cloudhosted only) -->
+  <% if (typeof config !== 'undefined' && config.isCloudhosted && user && user.role === 'admin') { %>
+  <!-- Billing Section (cloudhosted + admin only) -->
   <div class="settings-card card">
     <h2 class="settings-card-title"><%= lang === 'de' ? 'Abonnement & Abrechnung' : 'Subscription & Billing' %></h2>
     <% if (typeof tenantRecord !== 'undefined' && tenantRecord) { %>
