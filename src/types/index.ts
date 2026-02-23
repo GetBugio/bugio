@@ -119,6 +119,7 @@ export interface JWTPayload {
   userId: number;
   email: string;
   role: UserRole;
+  tenant?: string; // cloudhosted: which tenant this token belongs to
 }
 
 // Express augmentation for authenticated requests

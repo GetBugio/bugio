@@ -528,4 +528,70 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
     }
   });
+
+  // Billing: Upgrade button (Stripe Checkout)
+  const upgradeBtn = document.getElementById('upgrade-btn');
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', async () => {
+      upgradeBtn.disabled = true;
+      upgradeBtn.textContent = '...';
+      try {
+        const result = await api.post('/api/billing/checkout');
+        if (result.success && result.data?.url) {
+          window.location.href = result.data.url;
+        } else {
+          alert(result.error || 'Failed to start checkout');
+          upgradeBtn.disabled = false;
+          upgradeBtn.textContent = 'Upgrade now';
+        }
+      } catch {
+        alert('Network error');
+        upgradeBtn.disabled = false;
+      }
+    });
+  }
+
+  // Billing: Customer portal
+  const portalBtn = document.getElementById('portal-btn');
+  if (portalBtn) {
+    portalBtn.addEventListener('click', async () => {
+      portalBtn.disabled = true;
+      try {
+        const result = await api.post('/api/billing/portal');
+        if (result.success && result.data?.url) {
+          window.location.href = result.data.url;
+        } else {
+          alert(result.error || 'Failed to open portal');
+          portalBtn.disabled = false;
+        }
+      } catch {
+        alert('Network error');
+        portalBtn.disabled = false;
+      }
+    });
+  }
+
+  // Billing: Redeem coupon
+  const redeemBtn = document.getElementById('redeem-coupon-btn');
+  if (redeemBtn) {
+    redeemBtn.addEventListener('click', async () => {
+      const input = document.getElementById('coupon-code-input');
+      const resultDiv = document.getElementById('coupon-result');
+      const code = input?.value?.trim();
+      if (!code) return;
+
+      redeemBtn.disabled = true;
+      const result = await api.post('/api/tenant/redeem', { code });
+      redeemBtn.disabled = false;
+
+      if (result.success) {
+        resultDiv.style.color = 'var(--success)';
+        resultDiv.textContent = '✓ ' + (result.message || 'Coupon redeemed!');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        resultDiv.style.color = 'var(--error)';
+        resultDiv.textContent = '✗ ' + (result.error || 'Failed to redeem coupon');
+      }
+    });
+  }
 });

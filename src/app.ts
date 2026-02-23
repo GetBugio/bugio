@@ -5,8 +5,15 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { config } from './config.js';
-import routes from './routes/index.js';
+import apiRoutes from './routes/index.js';
 import frontendRoutes from './routes/frontend.routes.js';
+import registrationRoutes from './routes/registration.routes.js';
+import adminPlatformRoutes from './routes/admin-platform.routes.js';
+import { tenantMiddleware } from './middleware/tenant.middleware.js';
+import { trialGuard } from './middleware/trial-guard.middleware.js';
+import { requireAdminAuth } from './middleware/admin-auth.middleware.js';
+import { tenantStorage } from './db/connection.js';
+import { getT, parseLangFromCookie } from './services/i18n.service.js';
 import type { ApiResponse } from './types/index.js';
 
 export function createApp() {
@@ -32,11 +39,9 @@ export function createApp() {
       max: config.rateLimit.max,
       message: { success: false, error: 'Too many requests, please try again later' },
       skip: (req) => {
-        // Check Authorization header
         let token = req.headers.authorization?.startsWith('Bearer ')
           ? req.headers.authorization.substring(7)
           : undefined;
-        // Check cookie (no cookie-parser needed)
         if (!token && req.headers.cookie) {
           const match = req.headers.cookie.match(/(?:^|;\s*)token=([^;]+)/);
           if (match) token = match[1];
@@ -52,23 +57,89 @@ export function createApp() {
     })
   );
 
-  // Body parsing
+  // Stripe webhook needs raw body - mount before json parser
+  app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  // Static files - use process.cwd() for base path
+  // Static files
   const projectRoot = process.cwd();
   app.use(express.static(path.join(projectRoot, 'public')));
 
-  // View engine setup - views are in src/views but compiled to dist/views
+  // View engine setup
   app.set('view engine', 'ejs');
   app.set('views', path.join(projectRoot, 'src', 'views'));
 
-  // API routes
-  app.use('/api', routes);
+  if (config.isCloudhosted) {
+    // ─── Cloudhosted: Hostname-based routing ───────────────────────────────────
 
-  // Frontend routes
-  app.use('/', frontendRoutes);
+    // Build admin sub-router: handles admin.getbugio.com
+    const adminSubRouter = express.Router();
+    adminSubRouter.get('/login', (req, res) => {
+      const lang = parseLangFromCookie(req.headers.cookie);
+      const t = getT(lang);
+      res.render('platform-admin', { t, lang, config, page: 'login', authenticated: false });
+    });
+    // Admin API routes (POST /login, GET /stats, etc.) - no /api/ prefix needed for admin subdomain
+    adminSubRouter.use('/api', adminPlatformRoutes);
+    // Dashboard and all other authenticated routes
+    adminSubRouter.use('/', requireAdminAuth, (req, res, next) => {
+      const lang = parseLangFromCookie(req.headers.cookie);
+      const t = getT(lang);
+      // GET / → dashboard
+      if (req.method === 'GET') {
+        return res.render('platform-admin', { t, lang, config, page: 'dashboard', authenticated: true });
+      }
+      next();
+    });
+
+    // Build tenant sub-router: handles {tenant}.getbugio.com
+    const tenantSubRouter = express.Router();
+    tenantSubRouter.use('/api', apiRoutes);
+    tenantSubRouter.use('/', frontendRoutes);
+
+    // Minimal router for the base domain: registration API only (LP is served by web_bugio)
+    const baseRouter = express.Router();
+    baseRouter.use('/api/register', registrationRoutes);
+    baseRouter.use('/api/health', (_req, res) => res.json({ success: true, data: { status: 'healthy', mode: config.mode } }));
+    baseRouter.use('/', (_req, res) => res.status(404).json({ success: false, error: 'Not found' }));
+
+    app.use((req, res, next) => {
+      const host = req.hostname.split(':')[0];
+      const base = config.baseDomain;
+
+      // Base domain: getbugio.com or www.getbugio.com → registration API only
+      if (host === base || host === `www.${base}`) {
+        return baseRouter(req, res, next);
+      }
+
+      // admin.getbugio.com
+      if (host === `admin.${base}`) {
+        return adminSubRouter(req, res, next);
+      }
+
+      // {tenant}.getbugio.com - wrap in tenant context + trial guard
+      return tenantMiddleware(req, res, () => {
+        trialGuard(req, res, () => {
+          tenantSubRouter(req, res, next);
+        });
+      });
+    });
+
+  } else {
+    // ─── Selfhosted: Single-tenant mode ────────────────────────────────────────
+
+    // Wrap all requests in default tenant context
+    app.use((_req, _res, next) => {
+      tenantStorage.run(config.defaultTenant, next);
+    });
+
+    // API routes
+    app.use('/api', apiRoutes);
+
+    // Frontend routes
+    app.use('/', frontendRoutes);
+  }
 
   // 404 handler
   app.use((_req, res) => {

@@ -108,6 +108,35 @@
   </div>
   <% } %>
 
+  <% if (typeof config !== 'undefined' && config.isCloudhosted) { %>
+  <!-- Billing Section (cloudhosted only) -->
+  <div class="settings-card card">
+    <h2 class="settings-card-title"><%= lang === 'de' ? 'Abonnement & Abrechnung' : 'Subscription & Billing' %></h2>
+    <% if (typeof tenantRecord !== 'undefined' && tenantRecord) { %>
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem;">
+        <span class="status status-<%= tenantRecord.status %>"><%= tenantRecord.status %></span>
+        <% if (tenantRecord.status === 'trial' && typeof trialDaysLeft !== 'undefined' && trialDaysLeft !== null) { %>
+          <span style="color: var(--text-secondary); font-size: 0.875rem;"><%= lang === 'de' ? trialDaysLeft + ' Tage verbleibend' : trialDaysLeft + ' days remaining' %></span>
+        <% } %>
+      </div>
+    <% } %>
+    <% if (typeof tenantRecord !== 'undefined' && tenantRecord && (tenantRecord.status === 'trial' || tenantRecord.status === 'expired')) { %>
+      <button type="button" class="btn btn-primary" id="upgrade-btn" style="margin-bottom:1rem;"><%= lang === 'de' ? 'Jetzt upgraden – €4,99/Monat' : 'Upgrade now – €4.99/month' %></button>
+    <% } %>
+    <% if (typeof tenantRecord !== 'undefined' && tenantRecord && tenantRecord.stripe_customer_id) { %>
+      <button type="button" class="btn btn-secondary" id="portal-btn" style="margin-bottom:1rem;"><%= lang === 'de' ? 'Abonnement verwalten' : 'Manage subscription' %></button>
+    <% } %>
+    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
+      <p style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:0.75rem;"><%= lang === 'de' ? 'Gutschein-Code einlösen:' : 'Redeem coupon code:' %></p>
+      <div style="display:flex; gap:0.5rem;">
+        <input type="text" id="coupon-code-input" placeholder="<%= lang === 'de' ? 'z.B. WELCOME2025' : 'e.g. WELCOME2025' %>" style="flex:1; text-transform:uppercase;">
+        <button type="button" class="btn btn-secondary" id="redeem-coupon-btn"><%= lang === 'de' ? 'Einlösen' : 'Redeem' %></button>
+      </div>
+      <div id="coupon-result" style="margin-top:0.5rem; font-size:0.875rem;"></div>
+    </div>
+  </div>
+  <% } %>
+
   <!-- App Info -->
   <div class="settings-card card">
     <h2 class="settings-card-title"><%= t('settings.appInfo') %></h2>

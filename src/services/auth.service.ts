@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
-import { getDatabase } from '../db/connection.js';
+import { getDatabase, tenantStorage } from '../db/connection.js';
 import { generateToken } from '../middleware/auth.js';
+import { config } from '../config.js';
 import type { User, SafeUser, JWTPayload, RegisterRequest, LoginRequest } from '../types/index.js';
 
 const SALT_ROUNDS = 10;
@@ -123,11 +124,16 @@ export class AuthService {
 
   // Convert User to JWT payload
   private toJWTPayload(user: User): JWTPayload {
-    return {
+    const payload: JWTPayload = {
       userId: user.id,
       email: user.email,
       role: user.role,
     };
+    if (config.isCloudhosted) {
+      const tenant = tenantStorage.getStore();
+      if (tenant) payload.tenant = tenant;
+    }
+    return payload;
   }
 }
 

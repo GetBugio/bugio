@@ -100,6 +100,19 @@
       </a>
     </div>
 
+    <% if (typeof isTrial !== 'undefined' && isTrial && typeof trialDaysLeft !== 'undefined') { %>
+      <div style="margin: 0 0.75rem 0.75rem; padding: 0.6rem 0.75rem; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); border-radius: 8px; font-size: 0.8rem; color: #fbbf24;">
+        ⏱ <%= trialDaysLeft === 0 ? (lang === 'de' ? 'Trial endet heute' : 'Trial ends today') : (lang === 'de' ? trialDaysLeft + ' Tage verbleibend' : trialDaysLeft + ' days remaining') %>
+        <a href="/settings" style="display:block; margin-top:0.25rem; color: var(--primary); text-decoration:none; font-weight:500;"><%= lang === 'de' ? 'Jetzt upgraden →' : 'Upgrade now →' %></a>
+      </div>
+    <% } %>
+    <% if (typeof isExpired !== 'undefined' && isExpired) { %>
+      <div style="margin: 0 0.75rem 0.75rem; padding: 0.6rem 0.75rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; font-size: 0.8rem; color: #f87171;">
+        ⚠️ <%= lang === 'de' ? 'Trial abgelaufen' : 'Trial expired' %>
+        <a href="/settings" style="display:block; margin-top:0.25rem; color: var(--primary); text-decoration:none; font-weight:500;"><%= lang === 'de' ? 'Konto aktivieren →' : 'Activate account →' %></a>
+      </div>
+    <% } %>
+
     <nav class="sidebar-nav">
       <a href="/" class="sidebar-link" data-page="tickets">
         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>

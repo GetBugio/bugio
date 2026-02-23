@@ -53,6 +53,15 @@ export function authenticate(req: Request, res: Response<ApiResponse>, next: Nex
 
   try {
     const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;
+
+    // Cloudhosted: ensure token belongs to the current tenant
+    if (config.isCloudhosted && payload.tenant && res.locals.tenant) {
+      if (payload.tenant !== res.locals.tenant) {
+        res.status(403).json({ success: false, error: 'Token not valid for this workspace' });
+        return;
+      }
+    }
+
     req.user = payload;
     next();
   } catch {

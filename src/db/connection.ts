@@ -1,12 +1,48 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { AsyncLocalStorage } from 'async_hooks';
 import { config } from '../config.js';
 import { SCHEMA } from './schema.js';
 
+// ─── Selfhosted: single DB instance ─────────────────────────────────────────
+
 let db: Database.Database | null = null;
 
+// ─── Cloudhosted: per-tenant DB map + AsyncLocalStorage ──────────────────────
+
+export const tenantStorage = new AsyncLocalStorage<string>();
+const tenantDbs = new Map<string, Database.Database>();
+
+function initTenantDatabase(tenantName: string): Database.Database {
+  const tenantDir = path.join(config.dataDir, tenantName);
+  if (!fs.existsSync(tenantDir)) {
+    fs.mkdirSync(tenantDir, { recursive: true });
+  }
+
+  const dbPath = path.join(tenantDir, 'bugio.db');
+  const tenantDb = new Database(dbPath);
+  tenantDb.pragma('foreign_keys = ON');
+  tenantDb.pragma('journal_mode = WAL');
+  tenantDb.exec(SCHEMA);
+
+  tenantDbs.set(tenantName, tenantDb);
+  return tenantDb;
+}
+
+// ─── Public API ──────────────────────────────────────────────────────────────
+
 export function getDatabase(): Database.Database {
+  if (config.isCloudhosted) {
+    const tenant = tenantStorage.getStore();
+    if (!tenant) {
+      throw new Error('No tenant context found. Use tenantStorage.run() to set tenant.');
+    }
+    const existing = tenantDbs.get(tenant);
+    if (existing) return existing;
+    return initTenantDatabase(tenant);
+  }
+
   if (!db) {
     throw new Error('Database not initialized. Call initDatabase() first.');
   }
@@ -42,6 +78,10 @@ export function closeDatabase(): void {
     db.close();
     db = null;
   }
+  for (const [, tenantDb] of tenantDbs) {
+    tenantDb.close();
+  }
+  tenantDbs.clear();
 }
 
 // For testing: create an in-memory database

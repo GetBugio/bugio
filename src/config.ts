@@ -9,12 +9,39 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isDev: process.env.NODE_ENV !== 'production',
 
+  // Deployment Mode
+  mode: (process.env.MODE || 'selfhosted') as 'selfhosted' | 'cloudhosted',
+  isCloudhosted: process.env.MODE === 'cloudhosted',
+
   // JWT
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 
-  // Database
+  // Database (selfhosted: single DB path)
   databasePath: process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'bugio.db'),
+
+  // Data directory (cloudhosted: per-tenant DBs live here)
+  dataDir: process.env.DATA_DIR || path.join(process.cwd(), 'data'),
+
+  // Cloudhosted: multi-tenancy
+  baseDomain: process.env.BASE_DOMAIN || 'getbugio.com',
+  defaultTenant: process.env.DEFAULT_TENANT || 'default',
+  allowAutoProvision: process.env.ALLOW_AUTO_PROVISION === 'true',
+  adminToken: process.env.ADMIN_TOKEN || '',
+
+  // Reserved tenant names (cannot be registered)
+  reservedTenants: ['www', 'admin', 'docs', 'api', 'app', 'mail', 'smtp', 'ftp', 'dev', 'staging', 'test', 'demo', 'bugio', 'default'],
+
+  // Trial
+  trialDays: 14,
+
+  // Stripe
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+    priceId: process.env.STRIPE_PRICE_ID || '',
+    isConfigured: !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ID),
+  },
 
   // SMTP
   smtp: {

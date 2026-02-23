@@ -5,6 +5,8 @@ import { ticketService } from '../services/ticket.service.js';
 import { settingsService } from '../services/settings.service.js';
 import { getDatabase } from '../db/connection.js';
 import { getT, getJsTranslations, parseLangFromCookie } from '../services/i18n.service.js';
+import { getTenantRecord } from '../db/registry.js';
+import { tenantStorage } from '../db/connection.js';
 import type { User, TicketTag, TicketStatus, TicketQueryParams } from '../types/index.js';
 
 const router = Router();
@@ -46,13 +48,45 @@ function getUserFromRequest(req: Request): User | null {
   }
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { userId: number; role: string };
+    const decoded = jwt.verify(token, config.jwtSecret) as { userId: number; role: string; tenant?: string };
+
+    // In cloudhosted mode, verify token belongs to current tenant
+    if (config.isCloudhosted && decoded.tenant) {
+      const currentTenant = tenantStorage.getStore();
+      if (currentTenant && decoded.tenant !== currentTenant) {
+        return null;
+      }
+    }
+
     const db = getDatabase();
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.userId) as User | undefined;
     return user || null;
   } catch {
     return null;
   }
+}
+
+// Helper to get tenant billing info for views
+function getTenantBillingInfo(tenantName: string | undefined) {
+  if (!config.isCloudhosted || !tenantName) {
+    return { tenant: null, trialDaysLeft: null, isExpired: false, isTrial: false };
+  }
+
+  const tenant = getTenantRecord(tenantName);
+  if (!tenant) return { tenant: null, trialDaysLeft: null, isExpired: false, isTrial: false };
+
+  let trialDaysLeft: number | null = null;
+  if (tenant.status === 'trial' && tenant.trial_ends_at) {
+    const diff = new Date(tenant.trial_ends_at).getTime() - Date.now();
+    trialDaysLeft = Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }
+
+  return {
+    tenant,
+    trialDaysLeft,
+    isExpired: tenant.status === 'expired',
+    isTrial: tenant.status === 'trial',
+  };
 }
 
 // Helper to get common view data
@@ -62,6 +96,8 @@ function getCommonViewData(req: Request) {
   const lang = parseLangFromCookie(req.headers.cookie);
   const t = getT(lang);
   const jsTranslations = JSON.stringify(getJsTranslations(lang));
+  const tenantName = tenantStorage.getStore();
+  const billingInfo = getTenantBillingInfo(tenantName);
 
   return {
     settings: {
@@ -77,6 +113,13 @@ function getCommonViewData(req: Request) {
     t,
     lang,
     jsTranslations,
+    config,
+    // Tenant/billing info for cloudhosted mode
+    tenantName,
+    tenantRecord: billingInfo.tenant,
+    trialDaysLeft: billingInfo.trialDaysLeft,
+    isExpired: billingInfo.isExpired,
+    isTrial: billingInfo.isTrial,
   };
 }
 
@@ -115,7 +158,7 @@ router.get('/', (req: Request, res: Response) => {
     creatorEmail: tk.author_name || tk.author_email,
     voteCount: tk.vote_count,
     hasVoted: tk.user_has_voted,
-    commentCount: 0, // TODO: add comment count to query
+    commentCount: 0,
   }));
 
   const totalPages = Math.ceil(total / 20);
@@ -221,7 +264,7 @@ router.get('/login', (req: Request, res: Response) => {
   });
 });
 
-// Register page
+// Register page (user account registration within a tenant)
 router.get('/register', (req: Request, res: Response) => {
   const common = getCommonViewData(req);
 
@@ -241,7 +284,7 @@ router.get('/logout', (_req: Request, res: Response) => {
   res.redirect('/');
 });
 
-// Admin dashboard
+// Admin dashboard (tenant admin, not platform admin)
 router.get('/admin', (req: Request, res: Response) => {
   const common = getCommonViewData(req);
 
