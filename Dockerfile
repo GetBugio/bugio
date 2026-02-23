@@ -24,15 +24,6 @@ COPY public/ ./public/
 COPY src/views/ ./src/views/
 COPY src/locales/ ./src/locales/
 
-# db:init needs tsx (runs once at startup via entrypoint)
-RUN npm i tsx
-
-COPY src/db/init.ts ./src/db/init.ts
-COPY src/db/schema.ts ./src/db/schema.ts
-COPY src/db/connection.ts ./src/db/connection.ts
-COPY src/config.ts ./src/config.ts
-COPY src/types/ ./src/types/
-
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 

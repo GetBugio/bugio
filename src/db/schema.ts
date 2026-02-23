@@ -69,8 +69,3 @@ INSERT OR IGNORE INTO settings (key, value) VALUES
   ('logo_path', ''),
   ('default_statuses', 'open,in_review,in_progress,rejected,completed');
 `;
-
-export const INITIAL_ADMIN_QUERY = `
-INSERT OR IGNORE INTO users (email, password_hash, role)
-VALUES (?, ?, 'admin');
-`;

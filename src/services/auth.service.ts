@@ -20,12 +20,16 @@ export class AuthService {
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
+    // First user in the workspace becomes admin
+    const { count } = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
+    const role = count === 0 ? 'admin' : 'user';
+
     // Insert user
     const stmt = db.prepare(`
       INSERT INTO users (email, password_hash, role)
-      VALUES (?, ?, 'user')
+      VALUES (?, ?, ?)
     `);
-    const result = stmt.run(data.email, passwordHash);
+    const result = stmt.run(data.email, passwordHash, role);
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(result.lastInsertRowid) as User;
 

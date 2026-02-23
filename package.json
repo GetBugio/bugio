@@ -10,8 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src/",
-    "db:init": "tsx src/db/init.ts"
+    "lint": "eslint src/"
   },
   "keywords": [
     "bug-tracker",
