@@ -65,4 +65,57 @@
   </table>
 </div>
 
+<div class="card" style="margin-bottom: 2rem;">
+  <h2><%= t('admin.userManagement') %></h2>
+  <table class="admin-table" style="margin-top: 1rem;">
+    <thead>
+      <tr>
+        <th><%= t('admin.id') %></th>
+        <th><%= t('admin.emailCol') %></th>
+        <th><%= t('admin.roleCol') %></th>
+        <th><%= t('admin.verifiedCol') %></th>
+        <th><%= t('admin.created') %></th>
+        <th><%= t('admin.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(u => { %>
+        <tr>
+          <td>#<%= u.id %></td>
+          <td><%= u.email %></td>
+          <td>
+            <span class="tag <%= u.role === 'admin' ? 'tag-feature' : 'tag-bug' %>" style="font-size: 0.7rem;">
+              <%= u.role %>
+            </span>
+          </td>
+          <td>
+            <% if (u.email_verified) { %>
+              <span style="color: var(--success); font-weight: 500; font-size: 0.85rem;">
+                ✓ <%= t('admin.verified') %>
+              </span>
+            <% } else { %>
+              <span style="color: var(--warning); font-weight: 500; font-size: 0.85rem;">
+                ⏳ <%= t('admin.pendingVerification') %>
+              </span>
+            <% } %>
+          </td>
+          <td><%= new Date(u.created_at).toLocaleDateString() %></td>
+          <td>
+            <% if (u.id !== user.id) { %>
+              <button
+                class="btn btn-small btn-danger"
+                onclick="handleDeleteUser(<%= u.id %>, '<%= u.email %>')"
+              >
+                <%= t('common.delete') %>
+              </button>
+            <% } else { %>
+              <span style="color: var(--text-muted); font-size: 0.8rem;"><%= t('admin.yourself') %></span>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
 <%- include('partials/footer') %>

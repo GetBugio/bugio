@@ -7,7 +7,10 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  email_verified INTEGER NOT NULL DEFAULT 0,
+  email_verification_token TEXT,
+  email_verified_at TEXT
 );
 
 -- Tickets table

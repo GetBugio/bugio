@@ -5,6 +5,22 @@ import { AsyncLocalStorage } from 'async_hooks';
 import { config } from '../config.js';
 import { SCHEMA } from './schema.js';
 
+// Run schema migrations for existing databases (ALTER TABLE for new columns)
+function runMigrations(database: Database.Database): void {
+  const columns = database.pragma('table_info(users)') as { name: string }[];
+  const names = new Set(columns.map(c => c.name));
+
+  if (!names.has('email_verified')) {
+    database.exec('ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0');
+  }
+  if (!names.has('email_verification_token')) {
+    database.exec('ALTER TABLE users ADD COLUMN email_verification_token TEXT');
+  }
+  if (!names.has('email_verified_at')) {
+    database.exec('ALTER TABLE users ADD COLUMN email_verified_at TEXT');
+  }
+}
+
 // ─── Selfhosted: single DB instance ─────────────────────────────────────────
 
 let db: Database.Database | null = null;
@@ -25,6 +41,7 @@ function initTenantDatabase(tenantName: string): Database.Database {
   tenantDb.pragma('foreign_keys = ON');
   tenantDb.pragma('journal_mode = WAL');
   tenantDb.exec(SCHEMA);
+  runMigrations(tenantDb);
 
   tenantDbs.set(tenantName, tenantDb);
   return tenantDb;
@@ -67,8 +84,11 @@ export function initDatabase(dbPath?: string): Database.Database {
   // Enable WAL mode for better concurrency
   db.pragma('journal_mode = WAL');
 
-  // Run schema migrations
+  // Run schema (creates tables if not exist)
   db.exec(SCHEMA);
+
+  // Run migrations (adds new columns to existing tables)
+  runMigrations(db);
 
   return db;
 }
@@ -89,6 +109,7 @@ export function createTestDatabase(): Database.Database {
   const testDb = new Database(':memory:');
   testDb.pragma('foreign_keys = ON');
   testDb.exec(SCHEMA);
+  runMigrations(testDb);
   db = testDb;
   return testDb;
 }

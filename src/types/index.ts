@@ -16,10 +16,13 @@ export interface User {
   password_hash: string;
   role: UserRole;
   created_at: string;
+  email_verified: number; // 0 = unverified, 1 = verified
+  email_verification_token: string | null;
+  email_verified_at: string | null;
 }
 
-// User without sensitive data
-export type SafeUser = Omit<User, 'password_hash'>;
+// User without sensitive data (no password hash, no verification token)
+export type SafeUser = Omit<User, 'password_hash' | 'email_verification_token'>;
 
 // Ticket entity
 export interface Ticket {

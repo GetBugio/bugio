@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<div class="auth-container">
+  <div class="auth-form">
+    <div class="auth-logo">
+      <img src="/logo-icon.svg" alt="BugIO">
+    </div>
+    <h1><%= settings.systemName || 'BugIO' %></h1>
+
+    <% if (status === 'success') { %>
+      <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <%= t('verifyEmail.successMessage') %>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        <%= t('verifyEmail.successHint') %>
+      </p>
+      <% if (typeof authToken !== 'undefined' && authToken) { %>
+        <script>
+          // Auto-login after email verification
+          (function() {
+            var token = '<%= authToken %>';
+            var user = <%- JSON.stringify(verifiedUser) %>;
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            document.cookie = 'token=' + token + '; path=/; max-age=' + (7 * 24 * 60 * 60) + '; SameSite=Lax';
+          })();
+        </script>
+      <% } %>
+      <a href="/" class="btn btn-primary" style="width: 100%;">
+        <%= t('verifyEmail.goToApp') %>
+      </a>
+
+    <% } else if (status === 'pending') { %>
+      <p class="auth-subtitle"><%= t('verifyEmail.pendingTitle') %></p>
+      <div style="text-align: center; padding: 2rem 0; color: var(--text-muted);">
+        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin: 0 auto 1rem; display: block; opacity: 0.5;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <p><%= t('verifyEmail.pendingMessage') %></p>
+      </div>
+      <a href="/login" class="btn btn-secondary" style="width: 100%;">
+        <%= t('verifyEmail.backToLogin') %>
+      </a>
+
+    <% } else { %>
+      <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <%= t('verifyEmail.errorMessage') %>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        <%= t('verifyEmail.errorHint') %>
+      </p>
+      <a href="/register" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
+        <%= t('verifyEmail.registerAgain') %>
+      </a>
+      <a href="/login" class="btn btn-ghost" style="width: 100%;">
+        <%= t('verifyEmail.backToLogin') %>
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

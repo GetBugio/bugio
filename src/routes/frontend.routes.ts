@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config.js';
 import { ticketService } from '../services/ticket.service.js';
 import { settingsService } from '../services/settings.service.js';
+import { authService } from '../services/auth.service.js';
 import { getDatabase } from '../db/connection.js';
 import { getT, getJsTranslations, parseLangFromCookie } from '../services/i18n.service.js';
 import { getTenantRecord } from '../db/registry.js';
@@ -313,6 +314,9 @@ router.get('/admin', (req: Request, res: Response) => {
     voteCount: tk.vote_count,
   }));
 
+  // Get all users for user management section
+  const allUsers = authService.listUsers();
+
   res.render('admin', {
     ...common,
     title: common.t('admin.title'),
@@ -324,7 +328,39 @@ router.get('/admin', (req: Request, res: Response) => {
       totalUsers,
     },
     recentTickets,
+    users: allUsers,
   });
+});
+
+// Email verification page
+router.get('/verify-email', (req: Request, res: Response) => {
+  const common = getCommonViewData(req);
+  const token = req.query.token as string | undefined;
+
+  if (!token) {
+    return res.render('verify-email', {
+      ...common,
+      title: common.t('verifyEmail.title'),
+      status: 'pending',
+    });
+  }
+
+  try {
+    const { user, authToken } = authService.verifyEmail(token);
+    return res.render('verify-email', {
+      ...common,
+      title: common.t('verifyEmail.title'),
+      status: 'success',
+      verifiedUser: user,
+      authToken,
+    });
+  } catch {
+    return res.render('verify-email', {
+      ...common,
+      title: common.t('verifyEmail.title'),
+      status: 'error',
+    });
+  }
 });
 
 // Settings page (logged-in users only)

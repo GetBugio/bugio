@@ -9,7 +9,8 @@ export type EmailTemplate =
   | 'ticket_created'
   | 'ticket_status_changed'
   | 'ticket_updated'
-  | 'comment_added';
+  | 'comment_added'
+  | 'email_verification';
 
 interface EmailOptions {
   to: string;
@@ -36,6 +37,10 @@ interface CommentEmailData extends TicketEmailData {
 export class EmailService {
   private transporter: Transporter | null = null;
   private isConfigured: boolean = false;
+
+  get configured(): boolean {
+    return this.isConfigured;
+  }
 
   constructor() {
     this.initializeTransporter();
@@ -308,6 +313,42 @@ View ticket: ${ticketUrl}
     for (const email of adminEmails) {
       await this.send({ to: email, subject, html, text });
     }
+  }
+
+  // Public API: Send email verification link to new user
+  async sendVerificationEmail(email: string, token: string): Promise<void> {
+    const baseUrl = process.env.APP_URL || `http://localhost:${config.port}`;
+    const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
+
+    const subject = `[${process.env.SYSTEM_NAME || 'Bugio'}] Please verify your email address`;
+
+    const text = `
+Welcome! Please verify your email address to complete your registration.
+
+Click the link below to verify your email:
+${verifyUrl}
+
+This link will expire in 24 hours.
+
+If you did not register, you can safely ignore this email.
+`.trim();
+
+    const html = `
+<h2>Verify your email address</h2>
+<p>Welcome! Please click the button below to verify your email address and complete your registration.</p>
+<p style="margin: 2rem 0;">
+  <a href="${verifyUrl}" style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 6px; display: inline-block;">
+    Verify Email
+  </a>
+</p>
+<p style="color: #888; font-size: 0.875rem;">
+  Or copy this link into your browser:<br>
+  <a href="${verifyUrl}">${verifyUrl}</a>
+</p>
+<p style="color: #888; font-size: 0.875rem;">This link will expire in 24 hours. If you did not register, you can safely ignore this email.</p>
+`.trim();
+
+    await this.send({ to: email, subject, html, text });
   }
 
   // Verify SMTP configuration

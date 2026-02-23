@@ -189,6 +189,14 @@ async function handleRegister(event) {
     const result = await api.post('/api/auth/register', { email, password });
 
     if (result.success) {
+      // Email verification required: show success message, don't auto-login
+      if (result.data && result.data.requiresVerification) {
+        form.querySelectorAll('input, button').forEach(function(el) { el.disabled = true; });
+        showFormSuccess(form, i18n.registerVerifyEmailSent);
+        return;
+      }
+
+      // No verification needed (first user / SMTP not configured): auto-login
       const loginResult = await api.post('/api/auth/login', { email, password });
 
       if (loginResult.success && loginResult.data && loginResult.data.token) {
@@ -205,6 +213,26 @@ async function handleRegister(event) {
   } catch (error) {
     console.error('Register error:', error);
     showFormError(form, i18n.registerFailed);
+  }
+}
+
+// Delete user (admin only)
+async function handleDeleteUser(userId, email) {
+  if (!confirm((i18n.deleteUserConfirm || 'Delete user') + ' ' + email + '?')) {
+    return;
+  }
+
+  try {
+    const result = await api.delete('/api/auth/users/' + userId);
+
+    if (result.success) {
+      window.location.reload();
+    } else {
+      alert(result.error || (i18n.deleteUserFailed || 'Failed to delete user'));
+    }
+  } catch (error) {
+    console.error('Delete user error:', error);
+    alert(i18n.deleteUserFailed || 'Failed to delete user');
   }
 }
 
