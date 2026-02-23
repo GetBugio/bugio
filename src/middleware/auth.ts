@@ -52,7 +52,7 @@ export function authenticate(req: Request, res: Response<ApiResponse>, next: Nex
   }
 
   try {
-    const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;
+    const payload = jwt.verify(token, config.sessionSecret) as JWTPayload;
 
     // Cloudhosted: ensure token belongs to the current tenant
     if (config.isCloudhosted && payload.tenant && res.locals.tenant) {
@@ -76,7 +76,7 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction): 
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.substring(7);
     try {
-      const payload = jwt.verify(token, config.jwtSecret) as JWTPayload;
+      const payload = jwt.verify(token, config.sessionSecret) as JWTPayload;
       req.user = payload;
     } catch {
       // Invalid token, but that's okay for optional auth
@@ -103,8 +103,8 @@ export function requireAdmin(req: Request, res: Response<ApiResponse>, next: Nex
 
 // Generate JWT token
 export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn as string,
+  return jwt.sign(payload, config.sessionSecret, {
+    expiresIn: '7d',
   } as jwt.SignOptions);
 }
 

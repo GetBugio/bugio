@@ -48,7 +48,7 @@ function getUserFromRequest(req: Request): User | null {
   }
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret) as { userId: number; role: string; tenant?: string };
+    const decoded = jwt.verify(token, config.sessionSecret) as { userId: number; role: string; tenant?: string };
 
     // In cloudhosted mode, verify token belongs to current tenant
     if (config.isCloudhosted && decoded.tenant) {

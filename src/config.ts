@@ -3,6 +3,8 @@ import path from 'path';
 
 dotenv.config();
 
+const dataDir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
+
 export const config = {
   // Server
   port: parseInt(process.env.PORT || '3000', 10),
@@ -13,15 +15,12 @@ export const config = {
   mode: (process.env.MODE || 'selfhosted') as 'selfhosted' | 'cloudhosted',
   isCloudhosted: process.env.MODE === 'cloudhosted',
 
-  // JWT
-  jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  // Session / Authentication
+  sessionSecret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
 
-  // Database (selfhosted: single DB path)
-  databasePath: process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'bugio.db'),
-
-  // Data directory (cloudhosted: per-tenant DBs live here)
-  dataDir: process.env.DATA_DIR || path.join(process.cwd(), 'data'),
+  // Database
+  dataDir,
+  databasePath: path.join(dataDir, 'bugio.db'),
 
   // Cloudhosted: multi-tenancy
   baseDomain: process.env.BASE_DOMAIN || 'getbugio.com',

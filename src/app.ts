@@ -48,7 +48,7 @@ export function createApp() {
         }
         if (!token) return false;
         try {
-          jwt.verify(token, config.jwtSecret);
+          jwt.verify(token, config.sessionSecret);
           return true;
         } catch {
           return false;
