@@ -4,7 +4,9 @@ import { initI18n } from './services/i18n.service.js';
 import { config } from './config.js';
 
 // Initialize database
-initDatabase();
+if (!config.isCloudhosted) {
+  initDatabase();
+}
 
 // Initialize translations
 initI18n();
