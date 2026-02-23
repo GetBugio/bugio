@@ -8,47 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/landing.css">
   <style>
-    .pa-layout { display: flex; min-height: 100vh; }
-    .pa-sidebar { width: 220px; background: var(--pa-surface); border-right: 1px solid var(--pa-border); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0; }
-    .pa-sidebar-logo { font-size: 1.1rem; font-weight: 700; color: var(--pa-text); margin-bottom: 1.5rem; padding: 0 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-    .pa-nav-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.75rem; border-radius: 8px; color: var(--pa-text-muted); text-decoration: none; font-size: 0.9rem; cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: background 0.15s, color 0.15s; }
-    .pa-nav-link:hover, .pa-nav-link.active { background: var(--pa-accent-soft); color: var(--pa-accent); }
-    .pa-main { flex: 1; padding: 2rem; overflow: auto; }
-    .pa-page { display: none; }
-    .pa-page.active { display: block; }
-    .pa-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .pa-stat { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: 12px; padding: 1.25rem; }
-    .pa-stat-value { font-size: 2rem; font-weight: 700; color: var(--pa-accent); }
-    .pa-stat-label { font-size: 0.85rem; color: var(--pa-text-muted); margin-top: 0.25rem; }
-    .pa-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .pa-table th { text-align: left; padding: 0.75rem 1rem; background: var(--pa-surface); border-bottom: 1px solid var(--pa-border); color: var(--pa-text-muted); font-weight: 500; }
-    .pa-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--pa-border); color: var(--pa-text); vertical-align: middle; }
-    .pa-table tr:hover td { background: var(--pa-surface); }
-    .pa-badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-    .pa-badge-trial { background: rgba(234,179,8,0.15); color: #ca8a04; }
-    .pa-badge-active { background: rgba(34,197,94,0.15); color: #16a34a; }
-    .pa-badge-expired { background: rgba(239,68,68,0.15); color: #dc2626; }
-    .pa-badge-cancelled { background: rgba(107,114,128,0.15); color: #6b7280; }
-    .pa-btn { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-    .pa-btn:hover { opacity: 0.8; }
-    .pa-btn-primary { background: var(--pa-accent); color: #fff; }
-    .pa-btn-danger { background: #dc2626; color: #fff; }
-    .pa-btn-ghost { background: var(--pa-surface); color: var(--pa-text); border: 1px solid var(--pa-border); }
-    .pa-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-    .pa-section-header h2 { font-size: 1.25rem; font-weight: 600; color: var(--pa-text); }
-    .pa-form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
-    .pa-input { padding: 0.5rem 0.75rem; border: 1px solid var(--pa-border); border-radius: 8px; background: var(--pa-bg); color: var(--pa-text); font-size: 0.9rem; font-family: inherit; outline: none; }
-    .pa-input:focus { border-color: var(--pa-accent); }
-    .pa-select { padding: 0.5rem 0.75rem; border: 1px solid var(--pa-border); border-radius: 8px; background: var(--pa-bg); color: var(--pa-text); font-size: 0.9rem; font-family: inherit; cursor: pointer; }
-    .pa-login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .pa-login-card { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; }
-    .pa-login-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--pa-text); }
-    .pa-login-sub { color: var(--pa-text-muted); font-size: 0.9rem; margin-bottom: 2rem; }
-    .pa-error { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
-    .pa-success { background: rgba(34,197,94,0.1); color: #16a34a; border: 1px solid rgba(34,197,94,0.3); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.9rem; margin-bottom: 1rem; display: none; }
-
     :root {
       --pa-bg: #0b0b0d;
       --pa-surface: #111113;
@@ -58,117 +18,238 @@
       --pa-accent: #3b82f6;
       --pa-accent-soft: rgba(59,130,246,0.12);
     }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { background: var(--pa-bg); color: var(--pa-text); font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; }
+
+    /* Top bar */
+    .pa-topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 56px;
+      background: var(--pa-surface); border-bottom: 1px solid var(--pa-border);
+    }
+    .pa-topbar-logo { font-size: 1rem; font-weight: 700; color: var(--pa-text); }
+
+    /* Main content */
+    .pa-content { max-width: 1200px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* Cards */
+    .pa-card { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: 12px; padding: 1.5rem; }
+    .pa-card-title { font-size: 1.1rem; font-weight: 600; color: var(--pa-text); margin: 0 0 1.25rem; }
+
+    /* Stats */
+    .pa-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+    .pa-stat { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: 10px; padding: 1.25rem; }
+    .pa-stat-value { font-size: 2rem; font-weight: 700; color: var(--pa-accent); }
+    .pa-stat-label { font-size: 0.8rem; color: var(--pa-text-muted); margin-top: 0.25rem; }
+
+    /* Tables */
+    .pa-table-wrap { overflow-x: auto; }
+    .pa-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    .pa-table th { text-align: left; padding: 0.6rem 0.75rem; background: var(--pa-bg); border-bottom: 1px solid var(--pa-border); color: var(--pa-text-muted); font-weight: 500; white-space: nowrap; }
+    .pa-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--pa-border); color: var(--pa-text); vertical-align: middle; }
+    .pa-table tr:last-child td { border-bottom: none; }
+    .pa-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Badges */
+    .pa-badge { display: inline-flex; align-items: center; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+    .pa-badge-trial { background: rgba(234,179,8,0.15); color: #ca8a04; }
+    .pa-badge-active { background: rgba(34,197,94,0.15); color: #16a34a; }
+    .pa-badge-expired { background: rgba(239,68,68,0.15); color: #dc2626; }
+    .pa-badge-cancelled { background: rgba(107,114,128,0.15); color: #6b7280; }
+
+    /* Buttons */
+    .pa-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.85rem; border-radius: 6px; border: none; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: opacity 0.15s; font-family: inherit; }
+    .pa-btn:hover { opacity: 0.8; }
+    .pa-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .pa-btn-primary { background: var(--pa-accent); color: #fff; }
+    .pa-btn-danger { background: #dc2626; color: #fff; }
+    .pa-btn-ghost { background: transparent; color: var(--pa-text); border: 1px solid var(--pa-border); }
+    .pa-btn-sm { padding: 0.28rem 0.55rem; font-size: 0.78rem; }
+
+    /* Forms */
+    .pa-form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; }
+    .pa-field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .pa-label { font-size: 0.8rem; color: var(--pa-text-muted); }
+    .pa-input { padding: 0.5rem 0.75rem; border: 1px solid var(--pa-border); border-radius: 8px; background: var(--pa-bg); color: var(--pa-text); font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 0.15s; }
+    .pa-input:focus { border-color: var(--pa-accent); }
+    .pa-select { padding: 0.5rem 0.75rem; border: 1px solid var(--pa-border); border-radius: 8px; background: var(--pa-bg); color: var(--pa-text); font-size: 0.875rem; font-family: inherit; cursor: pointer; outline: none; }
+    .pa-select:focus { border-color: var(--pa-accent); }
+
+    /* Alerts */
+    .pa-alert { border-radius: 8px; padding: 0.65rem 1rem; font-size: 0.875rem; }
+    .pa-alert-error { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+    .pa-alert-success { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+
+    /* Section label */
+    .pa-section-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--pa-text-muted); margin: 0 0 1rem; }
+
+    /* Login */
+    .pa-login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .pa-login-card { background: var(--pa-surface); border: 1px solid var(--pa-border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 400px; }
+    .pa-login-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--pa-text); }
+    .pa-login-sub { color: var(--pa-text-muted); font-size: 0.875rem; margin-bottom: 2rem; }
+
+    /* Diagnose */
+    .pa-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; background: var(--pa-bg); border: 1px solid var(--pa-border); border-radius: 8px; padding: 1.25rem; white-space: pre-wrap; min-height: 80px; color: var(--pa-text-muted); }
   </style>
 </head>
-<body style="background: var(--pa-bg); color: var(--pa-text); font-family: 'Inter', sans-serif; margin: 0;">
+<body>
 
 <% if (page === 'login') { %>
   <div class="pa-login-wrap">
     <div class="pa-login-card">
       <div class="pa-login-title">🐛 Platform Admin</div>
       <div class="pa-login-sub">Bugio Admin Panel</div>
-      <div id="login-error" class="pa-error"></div>
+      <div id="login-error" class="pa-alert pa-alert-error" style="display:none;margin-bottom:1rem;"></div>
       <form id="login-form">
-        <div style="margin-bottom: 1rem;">
-          <label style="display:block;font-size:0.85rem;color:var(--pa-text-muted);margin-bottom:0.35rem;">Admin Token</label>
-          <input type="password" id="admin-token" class="pa-input" style="width:100%;box-sizing:border-box;" placeholder="Enter admin token" required>
+        <div class="pa-field" style="margin-bottom:1rem;">
+          <label class="pa-label">Admin Token</label>
+          <input type="password" id="admin-token" class="pa-input" placeholder="Enter admin token" required autocomplete="current-password">
         </div>
-        <button type="submit" class="pa-btn pa-btn-primary" style="width:100%;justify-content:center;padding:0.75rem;">Login</button>
+        <button type="submit" id="login-btn" class="pa-btn pa-btn-primary" style="width:100%;justify-content:center;padding:0.65rem;">Login</button>
       </form>
     </div>
   </div>
+
 <% } else { %>
-  <div class="pa-layout">
-    <aside class="pa-sidebar">
-      <div class="pa-sidebar-logo">🐛 Admin</div>
-      <button class="pa-nav-link active" data-section="dashboard">📊 Dashboard</button>
-      <button class="pa-nav-link" data-section="tenants">🏢 Tenants</button>
-      <button class="pa-nav-link" data-section="coupons">🎟 Coupons</button>
-      <button class="pa-nav-link" data-section="diagnose">🔧 Diagnose</button>
-      <div style="flex:1;"></div>
-      <button class="pa-nav-link" id="logout-btn">🚪 Logout</button>
-    </aside>
 
-    <main class="pa-main">
-      <!-- Dashboard -->
-      <div class="pa-page active" id="section-dashboard">
-        <div class="pa-section-header"><h2>Dashboard</h2></div>
-        <div class="pa-stats" id="stats-grid">
-          <div class="pa-stat"><div class="pa-stat-value" id="stat-total">-</div><div class="pa-stat-label">Total Workspaces</div></div>
-          <div class="pa-stat"><div class="pa-stat-value" id="stat-trial">-</div><div class="pa-stat-label">Trial</div></div>
-          <div class="pa-stat"><div class="pa-stat-value" id="stat-active">-</div><div class="pa-stat-label">Active</div></div>
-          <div class="pa-stat"><div class="pa-stat-value" id="stat-expired">-</div><div class="pa-stat-label">Expired</div></div>
-          <div class="pa-stat"><div class="pa-stat-value" id="stat-cancelled">-</div><div class="pa-stat-label">Cancelled</div></div>
+  <header class="pa-topbar">
+    <div class="pa-topbar-logo">🐛 Bugio Admin</div>
+    <button class="pa-btn pa-btn-ghost" id="logout-btn">Logout</button>
+  </header>
+
+  <main class="pa-content">
+
+    <!-- Stats -->
+    <div>
+      <div class="pa-section-label">Overview</div>
+      <div class="pa-stats">
+        <div class="pa-stat"><div class="pa-stat-value" id="stat-total">—</div><div class="pa-stat-label">Total Workspaces</div></div>
+        <div class="pa-stat"><div class="pa-stat-value" id="stat-trial">—</div><div class="pa-stat-label">Trial</div></div>
+        <div class="pa-stat"><div class="pa-stat-value" id="stat-active">—</div><div class="pa-stat-label">Active</div></div>
+        <div class="pa-stat"><div class="pa-stat-value" id="stat-expired">—</div><div class="pa-stat-label">Expired</div></div>
+        <div class="pa-stat"><div class="pa-stat-value" id="stat-cancelled">—</div><div class="pa-stat-label">Cancelled</div></div>
+      </div>
+    </div>
+
+    <!-- Provision Tenant -->
+    <div class="pa-card">
+      <div class="pa-card-title">Provision Tenant</div>
+      <div class="pa-form-row">
+        <div class="pa-field">
+          <label class="pa-label">Tenant Name *</label>
+          <input type="text" id="prov-name" class="pa-input" placeholder="e.g. bugio" style="width:180px;">
+        </div>
+        <div class="pa-field">
+          <label class="pa-label">Admin Email (optional)</label>
+          <input type="email" id="prov-email" class="pa-input" placeholder="admin@example.com" style="width:220px;">
+        </div>
+        <div class="pa-field">
+          <label class="pa-label">Admin Password (optional)</label>
+          <input type="password" id="prov-password" class="pa-input" placeholder="min. 6 chars" style="width:180px;" autocomplete="new-password">
+        </div>
+        <div class="pa-field">
+          <label class="pa-label">Status</label>
+          <select id="prov-status" class="pa-select">
+            <option value="active">active</option>
+            <option value="trial">trial</option>
+            <option value="expired">expired</option>
+            <option value="cancelled">cancelled</option>
+          </select>
+        </div>
+        <div class="pa-field">
+          <label class="pa-label">&nbsp;</label>
+          <button class="pa-btn pa-btn-primary" id="prov-btn" onclick="provisionTenant()">Create Tenant</button>
         </div>
       </div>
+      <div id="prov-msg" style="display:none;margin-top:0.75rem;"></div>
+    </div>
 
-      <!-- Tenants -->
-      <div class="pa-page" id="section-tenants">
-        <div class="pa-section-header">
-          <h2>Tenants</h2>
-          <button class="pa-btn pa-btn-ghost" onclick="loadTenants()">↻ Refresh</button>
-        </div>
-        <div id="tenants-error" class="pa-error"></div>
-        <div style="overflow-x:auto;">
-          <table class="pa-table">
-            <thead>
-              <tr>
-                <th>Name</th><th>Status</th><th>Trial ends</th><th>Stripe</th><th>Created</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="tenants-tbody">
-              <tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);">Loading...</td></tr>
-            </tbody>
-          </table>
-        </div>
+    <!-- Tenants -->
+    <div class="pa-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+        <div class="pa-card-title" style="margin:0;">Tenants</div>
+        <button class="pa-btn pa-btn-ghost" onclick="loadTenants()">↻ Refresh</button>
       </div>
+      <div id="tenants-msg" style="display:none;margin-bottom:1rem;"></div>
+      <div class="pa-table-wrap">
+        <table class="pa-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Status</th><th>Trial Ends</th><th>Created</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tenants-tbody">
+            <tr><td colspan="5" style="text-align:center;color:var(--pa-text-muted);padding:2rem;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-      <!-- Coupons -->
-      <div class="pa-page" id="section-coupons">
-        <div class="pa-section-header"><h2>Coupons</h2></div>
-        <div id="coupons-error" class="pa-error"></div>
-        <div id="coupons-success" class="pa-success"></div>
-
-        <!-- Create coupon form -->
-        <div style="background:var(--pa-surface);border:1px solid var(--pa-border);border-radius:12px;padding:1.5rem;margin-bottom:2rem;">
-          <h3 style="margin:0 0 1rem;font-size:1rem;">Create Coupon</h3>
-          <div class="pa-form-row">
-            <input type="text" id="coupon-code" class="pa-input" placeholder="Code (auto if empty)" style="width:160px;">
+    <!-- Coupons -->
+    <div class="pa-card">
+      <div class="pa-card-title">Coupons</div>
+      <div style="background:var(--pa-bg);border:1px solid var(--pa-border);border-radius:8px;padding:1.25rem;margin-bottom:1.5rem;">
+        <div class="pa-section-label" style="margin-bottom:0.75rem;">New Coupon</div>
+        <div class="pa-form-row">
+          <div class="pa-field">
+            <label class="pa-label">Code (auto if empty)</label>
+            <input type="text" id="coupon-code" class="pa-input" placeholder="SUMMER25" style="width:150px;">
+          </div>
+          <div class="pa-field">
+            <label class="pa-label">Type</label>
             <select id="coupon-type" class="pa-select">
               <option value="trial_extension">Trial Extension</option>
               <option value="free_access">Free Access</option>
               <option value="discount">Discount (Stripe)</option>
             </select>
-            <input type="number" id="coupon-value" class="pa-input" placeholder="Value (days)" style="width:120px;">
-            <input type="number" id="coupon-max-uses" class="pa-input" placeholder="Max uses (1)" style="width:110px;">
-            <input type="text" id="coupon-expires" class="pa-input" placeholder="Expires (ISO date)" style="width:180px;">
+          </div>
+          <div class="pa-field">
+            <label class="pa-label">Value (days)</label>
+            <input type="number" id="coupon-value" class="pa-input" placeholder="30" style="width:90px;" min="1">
+          </div>
+          <div class="pa-field">
+            <label class="pa-label">Max Uses</label>
+            <input type="number" id="coupon-max-uses" class="pa-input" placeholder="1" style="width:90px;" min="0">
+          </div>
+          <div class="pa-field">
+            <label class="pa-label">Expires (ISO)</label>
+            <input type="text" id="coupon-expires" class="pa-input" placeholder="2026-12-31" style="width:150px;">
+          </div>
+          <div class="pa-field">
+            <label class="pa-label">&nbsp;</label>
             <button class="pa-btn pa-btn-primary" onclick="createCoupon()">Create</button>
           </div>
         </div>
-
+        <div id="coupon-msg" style="display:none;margin-top:0.75rem;"></div>
+      </div>
+      <div class="pa-table-wrap">
         <table class="pa-table">
           <thead>
-            <tr><th>Code</th><th>Type</th><th>Value</th><th>Uses</th><th>Expires</th><th>Actions</th></tr>
+            <tr><th>Code</th><th>Type</th><th>Value</th><th>Uses</th><th>Expires</th><th></th></tr>
           </thead>
           <tbody id="coupons-tbody">
-            <tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);">Loading...</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);padding:2rem;">Loading...</td></tr>
           </tbody>
         </table>
       </div>
+    </div>
 
-      <!-- Diagnose -->
-      <div class="pa-page" id="section-diagnose">
-        <div class="pa-section-header">
-          <h2>Diagnose</h2>
-          <div style="display:flex;gap:0.5rem;">
-            <button class="pa-btn pa-btn-ghost" onclick="loadDiagnose()">↻ Run Diagnose</button>
-            <button class="pa-btn pa-btn-danger" onclick="runCleanup()">🧹 Cleanup Orphans</button>
-          </div>
+    <!-- Diagnose -->
+    <div class="pa-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+        <div class="pa-card-title" style="margin:0;">Diagnose</div>
+        <div style="display:flex;gap:0.5rem;">
+          <button class="pa-btn pa-btn-ghost" onclick="loadDiagnose()">↻ Run Diagnose</button>
+          <button class="pa-btn pa-btn-danger" onclick="runCleanup()">🧹 Cleanup Orphans</button>
         </div>
-        <div id="diagnose-result" style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;background:var(--pa-surface);border:1px solid var(--pa-border);border-radius:12px;padding:1.5rem;white-space:pre-wrap;"></div>
       </div>
-    </main>
-  </div>
+      <div id="diagnose-result" class="pa-mono">Click "Run Diagnose" to inspect the data directory.</div>
+    </div>
+
+  </main>
+
 <% } %>
 
 <script>
@@ -177,10 +258,14 @@
     e.preventDefault();
     const token = document.getElementById('admin-token').value;
     const err = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
     try {
       const res = await fetch('/admin/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ token }),
       });
       const data = await res.json();
@@ -189,108 +274,213 @@
       } else {
         err.textContent = data.error || 'Invalid token';
         err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Login';
       }
     } catch {
-      err.textContent = 'Network error';
+      err.textContent = 'Network error – please try again';
       err.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Login';
     }
   });
 <% } else { %>
-  // Navigation
-  document.querySelectorAll('[data-section]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.pa-nav-link').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.pa-page').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('section-' + btn.dataset.section).classList.add('active');
-      if (btn.dataset.section === 'tenants') loadTenants();
-      if (btn.dataset.section === 'coupons') loadCoupons();
-      if (btn.dataset.section === 'diagnose') loadDiagnose();
-    });
-  });
+
+  // Detect API base: works for /admin path (getbugio.com/admin) and admin subdomain (admin.getbugio.com)
+  const API = location.pathname.startsWith('/admin') ? '/admin/api' : '/api';
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await fetch('/admin/api/logout', { method: 'POST' });
-    location.reload();
+    await fetch(API + '/logout', { method: 'POST', credentials: 'include' });
+    location.href = location.pathname.startsWith('/admin') ? '/admin/login' : '/login';
   });
+
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.className = 'pa-alert pa-alert-' + type;
+    el.textContent = text;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
+  }
 
   function statusBadge(s) {
     return `<span class="pa-badge pa-badge-${s}">${s}</span>`;
   }
 
-  // Load stats
+  // ─── Stats ────────────────────────────────────────────────────────────────
   async function loadStats() {
     try {
-      const res = await fetch('/admin/api/stats');
+      const res = await fetch(API + '/stats', { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
         const s = data.data;
-        document.getElementById('stat-total').textContent = s.total;
-        document.getElementById('stat-trial').textContent = s.trial;
-        document.getElementById('stat-active').textContent = s.active;
-        document.getElementById('stat-expired').textContent = s.expired;
-        document.getElementById('stat-cancelled').textContent = s.cancelled;
+        document.getElementById('stat-total').textContent = s.total ?? '—';
+        document.getElementById('stat-trial').textContent = s.trial ?? '—';
+        document.getElementById('stat-active').textContent = s.active ?? '—';
+        document.getElementById('stat-expired').textContent = s.expired ?? '—';
+        document.getElementById('stat-cancelled').textContent = s.cancelled ?? '—';
       }
-    } catch {}
+    } catch { /* stats silent */ }
   }
 
-  // Load tenants
+  // ─── Provision ────────────────────────────────────────────────────────────
+  async function provisionTenant() {
+    const name = document.getElementById('prov-name').value.trim();
+    const adminEmail = document.getElementById('prov-email').value.trim() || undefined;
+    const adminPassword = document.getElementById('prov-password').value || undefined;
+    const status = document.getElementById('prov-status').value;
+    const btn = document.getElementById('prov-btn');
+    if (!name) { showMsg('prov-msg', 'error', 'Tenant name is required'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Creating...';
+    try {
+      const res = await fetch(API + '/provision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, adminEmail, adminPassword, status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg('prov-msg', 'success', `Tenant "${data.data.name}" created → ${data.data.workspaceUrl}`);
+        document.getElementById('prov-name').value = '';
+        document.getElementById('prov-email').value = '';
+        document.getElementById('prov-password').value = '';
+        loadTenants();
+        loadStats();
+      } else {
+        showMsg('prov-msg', 'error', data.error || 'Provision failed');
+      }
+    } catch {
+      showMsg('prov-msg', 'error', 'Network error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Tenant';
+    }
+  }
+
+  // ─── Tenants ──────────────────────────────────────────────────────────────
   async function loadTenants() {
     try {
-      const res = await fetch('/admin/api/tenants');
+      const res = await fetch(API + '/tenants', { credentials: 'include' });
       const data = await res.json();
-      if (!data.success) return;
+      if (!data.success) { showMsg('tenants-msg', 'error', data.error || 'Failed to load tenants'); return; }
       const tbody = document.getElementById('tenants-tbody');
+      if (!data.data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--pa-text-muted);padding:2rem;">No tenants yet</td></tr>';
+        return;
+      }
       tbody.innerHTML = data.data.map(t => `
         <tr>
           <td><strong>${t.name}</strong></td>
           <td>${statusBadge(t.status)}</td>
           <td style="font-size:0.8rem;color:var(--pa-text-muted);">${t.trial_ends_at ? new Date(t.trial_ends_at).toLocaleDateString() : '—'}</td>
-          <td style="font-size:0.8rem;color:var(--pa-text-muted);">${t.stripe_customer_id ? '✓' : '—'}</td>
           <td style="font-size:0.8rem;color:var(--pa-text-muted);">${new Date(t.created_at).toLocaleDateString()}</td>
           <td>
-            <select onchange="setTenantStatus('${t.name}', this.value)" style="font-size:0.8rem;padding:0.25rem 0.5rem;border:1px solid var(--pa-border);border-radius:4px;background:var(--pa-bg);color:var(--pa-text);">
-              <option value="" disabled selected>Change status</option>
-              <option value="trial">trial</option>
-              <option value="active">active</option>
-              <option value="expired">expired</option>
-              <option value="cancelled">cancelled</option>
-            </select>
+            <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">
+              <select id="sel-${t.name}" class="pa-select" style="font-size:0.8rem;padding:0.25rem 0.5rem;">
+                <option value="trial" ${t.status==='trial'?'selected':''}>trial</option>
+                <option value="active" ${t.status==='active'?'selected':''}>active</option>
+                <option value="expired" ${t.status==='expired'?'selected':''}>expired</option>
+                <option value="cancelled" ${t.status==='cancelled'?'selected':''}>cancelled</option>
+              </select>
+              <button class="pa-btn pa-btn-ghost pa-btn-sm" onclick="setTenantStatus('${t.name}')">Save</button>
+              <button class="pa-btn pa-btn-ghost pa-btn-sm" onclick="resetTenantPassword('${t.name}')">Reset PW</button>
+              <button class="pa-btn pa-btn-danger pa-btn-sm" onclick="deleteTenant('${t.name}')">Delete</button>
+            </div>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);">No tenants</td></tr>';
-    } catch {}
+      `).join('');
+    } catch {
+      showMsg('tenants-msg', 'error', 'Network error loading tenants');
+    }
   }
 
-  async function setTenantStatus(name, status) {
-    if (!status) return;
-    await fetch('/admin/api/tenants/' + name, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    loadTenants();
-    loadStats();
+  async function setTenantStatus(name) {
+    const status = document.getElementById('sel-' + name).value;
+    try {
+      const res = await fetch(API + '/tenants/' + name, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg('tenants-msg', 'success', `"${name}" status updated to ${status}`);
+        loadTenants();
+        loadStats();
+      } else {
+        showMsg('tenants-msg', 'error', data.error || 'Update failed');
+      }
+    } catch {
+      showMsg('tenants-msg', 'error', 'Network error');
+    }
   }
 
-  // Load coupons
+  async function resetTenantPassword(name) {
+    const newPassword = prompt(`Reset admin password for "${name}":\n(minimum 6 characters)`);
+    if (newPassword === null) return;
+    if (newPassword.length < 6) { alert('Password too short (minimum 6 characters)'); return; }
+    try {
+      const res = await fetch(API + '/tenants/' + name + '/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ newPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg('tenants-msg', 'success', `Password reset for ${data.data.adminEmail}`);
+      } else {
+        showMsg('tenants-msg', 'error', data.error || 'Reset failed');
+      }
+    } catch {
+      showMsg('tenants-msg', 'error', 'Network error');
+    }
+  }
+
+  async function deleteTenant(name) {
+    if (!confirm(`Delete tenant "${name}"?\n\nThis cannot be undone.`)) return;
+    try {
+      const res = await fetch(API + '/tenants/' + name, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg('tenants-msg', 'success', `Tenant "${name}" deleted`);
+        loadTenants();
+        loadStats();
+      } else {
+        showMsg('tenants-msg', 'error', data.error || 'Delete failed');
+      }
+    } catch {
+      showMsg('tenants-msg', 'error', 'Network error');
+    }
+  }
+
+  // ─── Coupons ──────────────────────────────────────────────────────────────
   async function loadCoupons() {
     try {
-      const res = await fetch('/admin/api/coupons');
+      const res = await fetch(API + '/coupons', { credentials: 'include' });
       const data = await res.json();
       if (!data.success) return;
       const tbody = document.getElementById('coupons-tbody');
+      if (!data.data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);padding:2rem;">No coupons yet</td></tr>';
+        return;
+      }
       tbody.innerHTML = data.data.map(c => `
         <tr>
-          <td><code style="font-family:'JetBrains Mono',monospace;">${c.code}</code></td>
-          <td>${c.type}</td>
+          <td><code style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">${c.code}</code></td>
+          <td style="color:var(--pa-text-muted);font-size:0.85rem;">${c.type}</td>
           <td>${c.value ?? '—'}</td>
-          <td>${c.times_used}/${c.max_uses === 0 ? '∞' : c.max_uses}</td>
+          <td style="color:var(--pa-text-muted);font-size:0.85rem;">${c.times_used}/${c.max_uses === 0 ? '∞' : c.max_uses}</td>
           <td style="font-size:0.8rem;color:var(--pa-text-muted);">${c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '—'}</td>
-          <td><button class="pa-btn pa-btn-danger" onclick="deleteCoupon('${c.code}')">Delete</button></td>
+          <td><button class="pa-btn pa-btn-danger pa-btn-sm" onclick="deleteCoupon('${c.code}')">Delete</button></td>
         </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--pa-text-muted);">No coupons</td></tr>';
-    } catch {}
+      `).join('');
+    } catch { /* silent */ }
   }
 
   async function createCoupon() {
@@ -299,64 +489,81 @@
     const value = document.getElementById('coupon-value').value ? parseInt(document.getElementById('coupon-value').value) : undefined;
     const maxUses = document.getElementById('coupon-max-uses').value ? parseInt(document.getElementById('coupon-max-uses').value) : undefined;
     const expiresAt = document.getElementById('coupon-expires').value.trim() || undefined;
-
-    const err = document.getElementById('coupons-error');
-    const suc = document.getElementById('coupons-success');
-
     try {
-      const res = await fetch('/admin/api/coupons', {
+      const res = await fetch(API + '/coupons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ code, type, value, maxUses, expiresAt }),
       });
       const data = await res.json();
       if (data.success) {
-        suc.textContent = 'Coupon created: ' + data.data.code;
-        suc.style.display = 'block';
-        err.style.display = 'none';
+        showMsg('coupon-msg', 'success', 'Coupon created: ' + data.data.code);
+        document.getElementById('coupon-code').value = '';
+        document.getElementById('coupon-value').value = '';
+        document.getElementById('coupon-max-uses').value = '';
+        document.getElementById('coupon-expires').value = '';
         loadCoupons();
       } else {
-        err.textContent = data.error;
-        err.style.display = 'block';
-        suc.style.display = 'none';
+        showMsg('coupon-msg', 'error', data.error || 'Failed to create coupon');
       }
     } catch {
-      err.textContent = 'Network error';
-      err.style.display = 'block';
+      showMsg('coupon-msg', 'error', 'Network error');
     }
   }
 
   async function deleteCoupon(code) {
-    if (!confirm('Delete coupon ' + code + '?')) return;
-    await fetch('/admin/api/coupons/' + code, { method: 'DELETE' });
-    loadCoupons();
+    if (!confirm('Delete coupon "' + code + '"?')) return;
+    try {
+      const res = await fetch(API + '/coupons/' + code, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg('coupon-msg', 'success', 'Coupon deleted');
+        loadCoupons();
+      } else {
+        showMsg('coupon-msg', 'error', data.error || 'Delete failed');
+      }
+    } catch {
+      showMsg('coupon-msg', 'error', 'Network error');
+    }
   }
 
-  // Diagnose
+  // ─── Diagnose ─────────────────────────────────────────────────────────────
   async function loadDiagnose() {
     const el = document.getElementById('diagnose-result');
     el.textContent = 'Running...';
     try {
-      const res = await fetch('/admin/api/diagnose');
+      const res = await fetch(API + '/diagnose', { credentials: 'include' });
       const data = await res.json();
       el.textContent = JSON.stringify(data.data, null, 2);
     } catch {
-      el.textContent = 'Error';
+      el.textContent = 'Network error';
     }
   }
 
   async function runCleanup() {
-    if (!confirm('Cleanup orphaned tenants?')) return;
+    if (!confirm('Cleanup orphaned tenants?\n\nThis removes registry entries that have no matching data folder.')) return;
     try {
-      const res = await fetch('/admin/api/cleanup', { method: 'POST' });
+      const res = await fetch(API + '/cleanup', { method: 'POST', credentials: 'include' });
       const data = await res.json();
-      alert('Cleaned up: ' + (data.data?.orphaned?.join(', ') || 'none'));
-      loadDiagnose();
-    } catch {}
+      const orphaned = data.data?.orphaned;
+      document.getElementById('diagnose-result').textContent = orphaned?.length
+        ? 'Removed orphaned tenants: ' + orphaned.join(', ')
+        : 'No orphaned tenants found.';
+      loadStats();
+    } catch {
+      document.getElementById('diagnose-result').textContent = 'Network error';
+    }
   }
 
-  // Initial load
+  // ─── Init ─────────────────────────────────────────────────────────────────
   loadStats();
+  loadTenants();
+  loadCoupons();
+
 <% } %>
 </script>
 </body>
