@@ -128,7 +128,8 @@
     "actions": "Aktionen",
     "verified": "Bestätigt",
     "pendingVerification": "Ausstehend",
-    "yourself": "Du"
+    "yourself": "Du",
+    "noUsersYet": "Noch keine Benutzer registriert."
   },
   "verifyEmail": {
     "title": "E-Mail bestätigen",

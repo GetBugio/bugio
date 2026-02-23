@@ -128,7 +128,8 @@
     "actions": "Actions",
     "verified": "Verified",
     "pendingVerification": "Pending",
-    "yourself": "You"
+    "yourself": "You",
+    "noUsersYet": "No users have registered yet."
   },
   "verifyEmail": {
     "title": "Verify Email",

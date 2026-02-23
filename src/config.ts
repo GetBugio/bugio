@@ -5,6 +5,18 @@ dotenv.config();
 
 const dataDir = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 
+// DNS-critical names – always reserved, cannot be overridden
+const SYSTEM_RESERVED = ['www', 'admin', 'docs', 'api', 'app', 'mail', 'smtp', 'ftp', 'default'];
+
+// Business names – reserved by default but can be overridden via EXTRA_RESERVED_TENANTS.
+// Set EXTRA_RESERVED_TENANTS="" to allow all of them, or e.g. "staging,dev" to keep only those.
+const extraReserved = (process.env.EXTRA_RESERVED_TENANTS !== undefined
+  ? process.env.EXTRA_RESERVED_TENANTS
+  : 'dev,staging,test,demo,bugio')
+  .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+const reservedTenants = [...new Set([...SYSTEM_RESERVED, ...extraReserved])];
+
 export const config = {
   // Server
   port: parseInt(process.env.PORT || '3000', 10),
@@ -28,8 +40,9 @@ export const config = {
   allowAutoProvision: process.env.ALLOW_AUTO_PROVISION === 'true',
   adminToken: process.env.ADMIN_TOKEN || '',
 
-  // Reserved tenant names (cannot be registered)
-  reservedTenants: ['www', 'admin', 'docs', 'api', 'app', 'mail', 'smtp', 'ftp', 'dev', 'staging', 'test', 'demo', 'bugio', 'default'],
+  // Reserved tenant names (cannot be registered via public signup)
+  // Combine system-reserved (always blocked) + extra-reserved (configurable via EXTRA_RESERVED_TENANTS env var)
+  reservedTenants,
 
   // Trial
   trialDays: 14,

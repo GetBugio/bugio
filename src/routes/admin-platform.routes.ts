@@ -43,7 +43,7 @@ router.post('/login', (req: Request, res: Response) => {
     sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000,
   });
-  res.json({ success: true, message: 'Logged in' });
+  res.json({ success: true, message: 'Logged in', sessionToken });
 });
 
 // POST /api/admin/logout

@@ -315,7 +315,12 @@ router.get('/admin', (req: Request, res: Response) => {
   }));
 
   // Get all users for user management section
-  const allUsers = authService.listUsers();
+  let allUsers: ReturnType<typeof authService.listUsers> = [];
+  try {
+    allUsers = authService.listUsers();
+  } catch {
+    // Non-fatal: admin page still renders, user list just empty
+  }
 
   res.render('admin', {
     ...common,

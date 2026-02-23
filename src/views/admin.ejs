@@ -67,6 +67,7 @@
 
 <div class="card" style="margin-bottom: 2rem;">
   <h2><%= t('admin.userManagement') %></h2>
+  <% if (typeof users !== 'undefined' && users.length > 0) { %>
   <table class="admin-table" style="margin-top: 1rem;">
     <thead>
       <tr>
@@ -104,7 +105,7 @@
             <% if (u.id !== user.id) { %>
               <button
                 class="btn btn-small btn-danger"
-                onclick="handleDeleteUser(<%= u.id %>, '<%= u.email %>')"
+                onclick="handleDeleteUser(<%= u.id %>, '<%= u.email.replace(/'/g, '\\\'') %>')"
               >
                 <%= t('common.delete') %>
               </button>
@@ -116,6 +117,11 @@
       <% }) %>
     </tbody>
   </table>
+  <% } else { %>
+  <p style="color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;">
+    <%= t('admin.noUsersYet') || 'No users have registered yet.' %>
+  </p>
+  <% } %>
 </div>
 
 <%- include('partials/footer') %>
