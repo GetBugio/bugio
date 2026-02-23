@@ -8,6 +8,7 @@ import { config } from './config.js';
 import apiRoutes from './routes/index.js';
 import frontendRoutes from './routes/frontend.routes.js';
 import registrationRoutes from './routes/registration.routes.js';
+import billingRoutes from './routes/billing.routes.js';
 import adminPlatformRoutes from './routes/admin-platform.routes.js';
 import { tenantMiddleware } from './middleware/tenant.middleware.js';
 import { trialGuard } from './middleware/trial-guard.middleware.js';
@@ -98,9 +99,10 @@ export function createApp() {
     tenantSubRouter.use('/api', apiRoutes);
     tenantSubRouter.use('/', frontendRoutes);
 
-    // Minimal router for the base domain: registration API only (LP is served by web_bugio)
+    // Minimal router for the base domain: registration + billing webhook (LP is served by web_bugio)
     const baseRouter = express.Router();
     baseRouter.use('/api/register', registrationRoutes);
+    baseRouter.use('/api/billing', billingRoutes);
     baseRouter.use('/api/health', (_req, res) => res.json({ success: true, data: { status: 'healthy', mode: config.mode } }));
     baseRouter.use('/', (_req, res) => res.status(404).json({ success: false, error: 'Not found' }));
 
