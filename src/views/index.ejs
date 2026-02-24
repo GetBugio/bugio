@@ -55,7 +55,9 @@
         <div class="ticket-votes">
           <% if (user) { %>
             <button class="vote-btn <%= ticket.hasVoted ? 'voted' : '' %>"
-                    onclick="handleVote(<%= ticket.id %>, '<%= ticket.hasVoted ? 'remove' : 'add' %>')"
+                    data-action="vote"
+                    data-ticket-id="<%= ticket.id %>"
+                    data-voted="<%= ticket.hasVoted %>"
                     title="<%= ticket.hasVoted ? t('tickets.removeVote') : t('tickets.upvote') %>">
               <%= ticket.hasVoted ? '▲' : '△' %>
             </button>

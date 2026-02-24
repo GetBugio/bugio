@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="ticket-votes" style="flex-direction: row; gap: 0.75rem;">
+    <div style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.35rem 0.9rem; border:1px solid rgba(59,130,246,0.18); border-radius:9999px; background:var(--bg-elevated); flex-shrink:0; white-space:nowrap;">
       <% if (user) { %>
         <button class="vote-btn <%= ticket.hasVoted ? 'voted' : '' %>"
                 data-action="vote"
@@ -31,7 +31,7 @@
         <span class="vote-btn" title="<%= t('tickets.loginToVote') %>">△</span>
       <% } %>
       <span class="vote-count"><%= ticket.voteCount %></span>
-      <span style="color: var(--text-disabled);"><%= t('ticket.votes') %></span>
+      <span style="color: var(--text-muted); font-size:0.85rem;"><%= t('ticket.votes') %></span>
     </div>
   </div>
 
