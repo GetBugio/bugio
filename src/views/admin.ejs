@@ -105,7 +105,9 @@
             <% if (u.id !== user.id) { %>
               <button
                 class="btn btn-small btn-danger"
-                onclick="handleDeleteUser(<%= u.id %>, '<%= u.email.replace(/'/g, '\\\'') %>')"
+                data-action="delete-user"
+                data-user-id="<%= u.id %>"
+                data-user-email="<%= u.email %>"
               >
                 <%= t('common.delete') %>
               </button>

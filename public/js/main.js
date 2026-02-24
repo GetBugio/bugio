@@ -528,6 +528,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Delete user buttons (admin panel)
+  document.querySelectorAll('[data-action="delete-user"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      handleDeleteUser(btn.dataset.userId, btn.dataset.userEmail);
+    });
+  });
+
   // Handle forms with data-form attribute
   document.querySelectorAll('form[data-form]').forEach(form => {
     const formType = form.dataset.form;
