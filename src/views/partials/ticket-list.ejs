@@ -1,0 +1,83 @@
+<%
+function buildQS(params, exclude) {
+  var parts = [];
+  Object.entries(params).forEach(function([k, v]) {
+    if (exclude && exclude.includes(k)) return;
+    if (v === undefined || v === null || v === '') return;
+    if (Array.isArray(v)) {
+      v.forEach(function(item) { parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(item)); });
+    } else {
+      parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+    }
+  });
+  return parts.join('&');
+}
+%>
+<div class="ticket-list">
+  <% if (tickets.length === 0) { %>
+    <div class="card">
+      <p><%= t('tickets.noTickets') %> <a href="/create"><%= t('tickets.createFirst') %></a></p>
+    </div>
+  <% } else { %>
+    <% tickets.forEach(function(ticket) { %>
+      <div class="card ticket-card">
+        <div class="ticket-votes">
+          <% if (user) { %>
+            <button class="vote-btn <%= ticket.hasVoted ? 'voted' : '' %>"
+                    data-action="vote"
+                    data-ticket-id="<%= ticket.id %>"
+                    data-voted="<%= ticket.hasVoted %>"
+                    title="<%= ticket.hasVoted ? t('tickets.removeVote') : t('tickets.upvote') %>">
+              <%= ticket.hasVoted ? '▲' : '△' %>
+            </button>
+          <% } else { %>
+            <span class="vote-btn" title="<%= t('tickets.loginToVote') %>">△</span>
+          <% } %>
+          <span class="vote-count"><%= ticket.voteCount %></span>
+        </div>
+
+        <div class="ticket-content">
+          <div class="ticket-header">
+            <a href="/ticket/<%= ticket.id %>" class="ticket-title"><%= ticket.title %></a>
+            <span class="tag tag-<%= ticket.tag %>"><%= ticket.tag %></span>
+            <span class="status status-<%= ticket.status.replace(' ', '_').toLowerCase() %>"><%= t('status.' + ticket.status) %></span>
+          </div>
+
+          <div class="ticket-meta">
+            #<%= ticket.id %> <%= t('common.opened') %> <%= new Date(ticket.createdAt).toLocaleDateString() %>
+            <% if (ticket.creatorEmail) { %>
+              <%= t('common.by') %> <%= ticket.creatorEmail %>
+            <% } %>
+            &middot; <%= ticket.commentCount || 0 %> <%= (ticket.commentCount || 0) !== 1 ? t('tickets.comments') : t('tickets.comment') %>
+          </div>
+
+          <% if (ticket.description) { %>
+            <div class="ticket-description">
+              <%= ticket.description.substring(0, 200) %><%= ticket.description.length > 200 ? '...' : '' %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+</div>
+
+<% if (pagination && pagination.totalPages > 1) { %>
+  <div class="pagination">
+    <% if (pagination.page > 1) { %>
+      <a href="?page=<%= pagination.page - 1 %>&<%= buildQS(query, ['page']) %>"><%- t('tickets.prev') %></a>
+    <% } %>
+
+    <% for (var i = 1; i <= pagination.totalPages; i++) { %>
+      <% if (i === pagination.page) { %>
+        <span class="active"><%= i %></span>
+      <% } else { %>
+        <a href="?page=<%= i %>&<%= buildQS(query, ['page']) %>"><%= i %></a>
+      <% } %>
+    <% } %>
+
+    <% if (pagination.page < pagination.totalPages) { %>
+      <a href="?page=<%= pagination.page + 1 %>&<%= buildQS(query, ['page']) %>"><%- t('tickets.next') %></a>
+    <% } %>
+  </div>
+<% } %>

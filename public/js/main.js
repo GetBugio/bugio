@@ -42,6 +42,37 @@ const api = {
   delete: (url) => api.request('DELETE', url),
 };
 
+// Apply filters via AJAX (no full page reload)
+function applyFilters() {
+  const form = document.getElementById('filter-form');
+  const container = document.getElementById('ticket-list-container');
+  if (!form || !container) { if (form) form.submit(); return; }
+
+  const params = new URLSearchParams();
+  new FormData(form).forEach(function(value, key) { params.append(key, value); });
+  const qs = params.toString();
+
+  fetch('/?' + qs, { headers: { 'X-Partial': '1' } })
+    .then(function(r) { return r.text(); })
+    .then(function(html) {
+      container.innerHTML = html;
+      attachVoteListeners();
+      history.pushState(null, '', qs ? '/?' + qs : '/');
+    })
+    .catch(function() { form.submit(); });
+}
+
+// Attach vote button listeners (called on load and after AJAX update)
+function attachVoteListeners() {
+  document.querySelectorAll('[data-action="vote"]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var ticketId = btn.dataset.ticketId;
+      var hasVoted = btn.dataset.voted === 'true';
+      handleVote(ticketId, hasVoted ? 'remove' : 'add');
+    });
+  });
+}
+
 // Vote handling
 async function handleVote(ticketId, action) {
   const token = getToken();
@@ -473,6 +504,78 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.lang-dropdown.open').forEach(d => d.classList.remove('open'));
   });
 
+  // Filter selects: auto-submit on change
+  const filterForm = document.getElementById('filter-form');
+  if (filterForm) {
+    filterForm.querySelectorAll('select').forEach(function(sel) {
+      sel.addEventListener('change', applyFilters);
+    });
+  }
+
+  // Status multi-select dropdown
+  const statusBtn = document.getElementById('status-btn');
+  const statusDropdown = document.getElementById('status-dropdown');
+  const statusMultiselect = document.getElementById('status-multiselect');
+  if (statusBtn && statusDropdown) {
+    let statusChanged = false;
+
+    statusDropdown.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      cb.addEventListener('change', function() { statusChanged = true; });
+    });
+
+    function updateStatusBtnLabel() {
+      const label = document.getElementById('status-btn-label');
+      if (!label) return;
+      const checked = [...statusDropdown.querySelectorAll('input[type="checkbox"]:checked')];
+      if (checked.length === 0) {
+        label.textContent = label.dataset.all || 'Alle';
+      } else if (checked.length === 1) {
+        const span = checked[0].closest('label').querySelector('.status');
+        label.textContent = span ? span.textContent.trim() : checked[0].value;
+      } else {
+        label.textContent = checked.length + ' ausgewählt';
+      }
+    }
+
+    function closeStatusDropdown() {
+      if (!statusDropdown.classList.contains('open')) return;
+      statusDropdown.classList.remove('open');
+      statusBtn.classList.remove('active');
+      if (statusChanged) {
+        statusChanged = false;
+        updateStatusBtnLabel();
+        applyFilters();
+      }
+    }
+
+    statusBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (statusDropdown.classList.contains('open')) {
+        closeStatusDropdown();
+      } else {
+        statusChanged = false;
+        statusDropdown.classList.add('open');
+        statusBtn.classList.add('active');
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (statusMultiselect && !statusMultiselect.contains(e.target)) {
+        closeStatusDropdown();
+      }
+    });
+  }
+
+  // Filter search: auto-submit with debounce
+  const searchInput = document.querySelector('#filter-form input[name="search"]');
+  if (searchInput) {
+    let searchTimer;
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFilters, 400);
+    });
+  }
+
   // Color input live hex display
   document.querySelectorAll('.color-input-row input[type="color"]').forEach(input => {
     input.addEventListener('input', () => {
@@ -497,14 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Vote buttons on ticket detail page
-  document.querySelectorAll('[data-action="vote"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const ticketId = btn.dataset.ticketId;
-      const hasVoted = btn.dataset.voted === 'true';
-      handleVote(ticketId, hasVoted ? 'remove' : 'add');
-    });
-  });
+  // Vote buttons
+  attachVoteListeners();
 
   // Status change form
   document.querySelectorAll('form[data-action="status-change"]').forEach(form => {

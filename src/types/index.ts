@@ -154,7 +154,7 @@ export interface TicketQueryParams {
   page?: number;
   limit?: number;
   tag?: TicketTag;
-  status?: TicketStatus;
+  status?: TicketStatus | TicketStatus[];
   sort?: 'votes' | 'created_at' | 'updated_at';
   order?: 'asc' | 'desc';
   search?: string;

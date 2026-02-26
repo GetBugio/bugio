@@ -130,21 +130,31 @@ router.get('/', (req: Request, res: Response) => {
 
   const page = parseInt(req.query.page as string) || 1;
   const tagRaw = req.query.tag as string | undefined;
-  const statusRaw = req.query.status as string | undefined;
+  const statusRawValue = req.query.status;
   const sortBy = req.query.sortBy as string | undefined;
   const searchRaw = req.query.search;
   const search = typeof searchRaw === 'string' ? searchRaw : undefined;
 
   // Validate and type-cast
   const tag: TicketTag | undefined = isValidTag(tagRaw) ? tagRaw : undefined;
-  const status: TicketStatus | undefined = isValidStatus(statusRaw) ? statusRaw : undefined;
+
+  // Handle status as single value or array
+  let statuses: TicketStatus[] | undefined;
+  let statusQueryValue: string | string[] | undefined;
+  if (Array.isArray(statusRawValue)) {
+    const valid = (statusRawValue as string[]).filter(isValidStatus) as TicketStatus[];
+    if (valid.length > 0) { statuses = valid; statusQueryValue = valid; }
+  } else if (typeof statusRawValue === 'string' && isValidStatus(statusRawValue)) {
+    statuses = [statusRawValue as TicketStatus];
+    statusQueryValue = statusRawValue;
+  }
 
   // Map frontend sortBy to backend sort param
   let sort: SortOption = 'created_at';
   if (sortBy === 'votes') sort = 'votes';
   if (sortBy === 'updatedAt') sort = 'updated_at';
 
-  const queryParams: TicketQueryParams = { page, limit: 20, tag, status, sort, order: 'desc', search };
+  const queryParams: TicketQueryParams = { page, limit: 20, tag, status: statuses, sort, order: 'desc', search };
 
   const { tickets: rawTickets, total } = ticketService.list(queryParams, common.user?.id);
 
@@ -164,13 +174,18 @@ router.get('/', (req: Request, res: Response) => {
 
   const totalPages = Math.ceil(total / 20);
 
-  res.render('index', {
+  const viewData = {
     ...common,
-    title: common.t('tickets.title'),
     tickets,
     pagination: { page, totalPages, total },
-    query: { tag: tagRaw, status: statusRaw, sortBy: sortBy || 'createdAt', search },
-  });
+    query: { tag: tagRaw, status: statusQueryValue, sortBy: sortBy || 'createdAt', search },
+  };
+
+  if (req.headers['x-partial'] === '1') {
+    res.render('partials/ticket-list', viewData);
+  } else {
+    res.render('index', { ...viewData, title: common.t('tickets.title') });
+  }
 });
 
 // Create ticket page

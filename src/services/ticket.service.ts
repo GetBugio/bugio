@@ -91,8 +91,10 @@ export class TicketService {
     }
 
     if (status) {
-      conditions.push('t.status = ?');
-      values.push(status);
+      const statusArray = Array.isArray(status) ? status : [status];
+      const placeholders = statusArray.map(() => '?').join(', ');
+      conditions.push(`t.status IN (${placeholders})`);
+      values.push(...statusArray);
     }
 
     if (search) {

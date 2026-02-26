@@ -5,11 +5,12 @@
   <a href="/create" class="btn btn-primary"><%= t('tickets.newTicket') %></a>
 </div>
 
+<% const selectedStatuses = Array.isArray(query.status) ? query.status : (query.status ? [query.status] : []) %>
 <div class="filters">
   <form method="get" action="/" id="filter-form">
     <div class="filter-group">
       <label for="tag"><%= t('tickets.type') %></label>
-      <select name="tag" id="tag" onchange="this.form.submit()">
+      <select name="tag" id="tag">
         <option value=""><%= t('common.all') %></option>
         <option value="bug" <%= query.tag === 'bug' ? 'selected' : '' %>><%= t('common.bug') %></option>
         <option value="feature" <%= query.tag === 'feature' ? 'selected' : '' %>><%= t('common.feature') %></option>
@@ -17,100 +18,55 @@
     </div>
 
     <div class="filter-group">
-      <label for="status"><%= t('tickets.status') %></label>
-      <select name="status" id="status" onchange="this.form.submit()">
-        <option value=""><%= t('common.all') %></option>
-        <option value="open" <%= query.status === 'open' ? 'selected' : '' %>><%= t('status.open') %></option>
-        <option value="in_review" <%= query.status === 'in_review' ? 'selected' : '' %>><%= t('status.in_review') %></option>
-        <option value="in_progress" <%= query.status === 'in_progress' ? 'selected' : '' %>><%= t('status.in_progress') %></option>
-        <option value="rejected" <%= query.status === 'rejected' ? 'selected' : '' %>><%= t('status.rejected') %></option>
-        <option value="completed" <%= query.status === 'completed' ? 'selected' : '' %>><%= t('status.completed') %></option>
-      </select>
+      <label><%= t('tickets.status') %></label>
+      <div class="multi-select" id="status-multiselect">
+        <button type="button" class="multi-select-btn" id="status-btn">
+          <span id="status-btn-label" data-all="<%= t('common.all') %>"><%
+            if (selectedStatuses.length === 0) { %><%= t('common.all') %><%
+            } else if (selectedStatuses.length === 1) { %><%= t('status.' + selectedStatuses[0]) %><%
+            } else { %><%= selectedStatuses.length %> ausgewählt<%
+            }
+          %></span>
+          <svg class="multi-select-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 4l4 4 4-4"/></svg>
+        </button>
+        <div class="multi-select-dropdown" id="status-dropdown">
+          <% const statusOptions = [
+            { value: 'open', label: t('status.open') },
+            { value: 'in_review', label: t('status.in_review') },
+            { value: 'in_progress', label: t('status.in_progress') },
+            { value: 'rejected', label: t('status.rejected') },
+            { value: 'completed', label: t('status.completed') }
+          ] %>
+          <% statusOptions.forEach(function(opt) { %>
+            <label class="multi-select-option">
+              <input type="checkbox" name="status" value="<%= opt.value %>"
+                <%= selectedStatuses.includes(opt.value) ? 'checked' : '' %>>
+              <span class="status status-<%= opt.value %>"><%= opt.label %></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
     </div>
 
     <div class="filter-group">
       <label for="sortBy"><%= t('tickets.sort') %></label>
-      <select name="sortBy" id="sortBy" onchange="this.form.submit()">
+      <select name="sortBy" id="sortBy">
         <option value="createdAt" <%= query.sortBy === 'createdAt' || !query.sortBy ? 'selected' : '' %>><%= t('tickets.newest') %></option>
         <option value="votes" <%= query.sortBy === 'votes' ? 'selected' : '' %>><%= t('tickets.mostVoted') %></option>
         <option value="updatedAt" <%= query.sortBy === 'updatedAt' ? 'selected' : '' %>><%= t('tickets.recentlyUpdated') %></option>
       </select>
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group filter-group-search">
       <input type="text" name="search" placeholder="<%= t('tickets.searchPlaceholder') %>" value="<%= query.search || '' %>">
       <button type="submit" class="btn btn-small btn-secondary"><%= t('common.search') %></button>
     </div>
   </form>
 </div>
 
-<div class="ticket-list">
-  <% if (tickets.length === 0) { %>
-    <div class="card">
-      <p><%= t('tickets.noTickets') %> <a href="/create"><%= t('tickets.createFirst') %></a></p>
-    </div>
-  <% } else { %>
-    <% tickets.forEach(ticket => { %>
-      <div class="card ticket-card">
-        <div class="ticket-votes">
-          <% if (user) { %>
-            <button class="vote-btn <%= ticket.hasVoted ? 'voted' : '' %>"
-                    data-action="vote"
-                    data-ticket-id="<%= ticket.id %>"
-                    data-voted="<%= ticket.hasVoted %>"
-                    title="<%= ticket.hasVoted ? t('tickets.removeVote') : t('tickets.upvote') %>">
-              <%= ticket.hasVoted ? '▲' : '△' %>
-            </button>
-          <% } else { %>
-            <span class="vote-btn" title="<%= t('tickets.loginToVote') %>">△</span>
-          <% } %>
-          <span class="vote-count"><%= ticket.voteCount %></span>
-        </div>
 
-        <div class="ticket-content">
-          <div class="ticket-header">
-            <a href="/ticket/<%= ticket.id %>" class="ticket-title"><%= ticket.title %></a>
-            <span class="tag tag-<%= ticket.tag %>"><%= ticket.tag %></span>
-            <span class="status status-<%= ticket.status.replace(' ', '_').toLowerCase() %>"><%= t('status.' + ticket.status) %></span>
-          </div>
-
-          <div class="ticket-meta">
-            #<%= ticket.id %> <%= t('common.opened') %> <%= new Date(ticket.createdAt).toLocaleDateString() %>
-            <% if (ticket.creatorEmail) { %>
-              <%= t('common.by') %> <%= ticket.creatorEmail %>
-            <% } %>
-            &middot; <%= ticket.commentCount || 0 %> <%= (ticket.commentCount || 0) !== 1 ? t('tickets.comments') : t('tickets.comment') %>
-          </div>
-
-          <% if (ticket.description) { %>
-            <div class="ticket-description">
-              <%= ticket.description.substring(0, 200) %><%= ticket.description.length > 200 ? '...' : '' %>
-            </div>
-          <% } %>
-        </div>
-      </div>
-    <% }) %>
-  <% } %>
+<div id="ticket-list-container">
+  <%- include('partials/ticket-list') %>
 </div>
-
-<% if (pagination && pagination.totalPages > 1) { %>
-  <div class="pagination">
-    <% if (pagination.page > 1) { %>
-      <a href="?page=<%= pagination.page - 1 %>&<%= Object.entries(query).filter(([k]) => k !== 'page').map(([k, v]) => k + '=' + v).join('&') %>"><%- t('tickets.prev') %></a>
-    <% } %>
-
-    <% for (let i = 1; i <= pagination.totalPages; i++) { %>
-      <% if (i === pagination.page) { %>
-        <span class="active"><%= i %></span>
-      <% } else { %>
-        <a href="?page=<%= i %>&<%= Object.entries(query).filter(([k]) => k !== 'page').map(([k, v]) => k + '=' + v).join('&') %>"><%= i %></a>
-      <% } %>
-    <% } %>
-
-    <% if (pagination.page < pagination.totalPages) { %>
-      <a href="?page=<%= pagination.page + 1 %>&<%= Object.entries(query).filter(([k]) => k !== 'page').map(([k, v]) => k + '=' + v).join('&') %>"><%- t('tickets.next') %></a>
-    <% } %>
-  </div>
-<% } %>
 
 <%- include('partials/footer') %>
