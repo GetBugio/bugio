@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS tickets (
   author_email TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  deleted_at TEXT DEFAULT NULL
+  deleted_at TEXT DEFAULT NULL,
+  milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL
 );
 
 -- Votes table (unique constraint for one vote per user per ticket)
@@ -71,7 +72,6 @@ CREATE INDEX IF NOT EXISTS idx_votes_ticket_id ON votes(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_votes_user_id ON votes(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_ticket_id ON comments(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_comments_user_id ON comments(user_id);
-CREATE INDEX IF NOT EXISTS idx_tickets_milestone_id ON tickets(milestone_id);
 
 -- Default settings
 INSERT OR IGNORE INTO settings (key, value) VALUES

@@ -26,6 +26,7 @@ function runMigrations(database: Database.Database): void {
   if (!ticketColNames.has('milestone_id')) {
     database.exec('ALTER TABLE tickets ADD COLUMN milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL');
   }
+  database.exec('CREATE INDEX IF NOT EXISTS idx_tickets_milestone_id ON tickets(milestone_id)');
 }
 
 // ─── Selfhosted: single DB instance ─────────────────────────────────────────
