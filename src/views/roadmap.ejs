@@ -1,0 +1,751 @@
+<%- include('partials/header') %>
+
+<style>
+  .roadmap-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .roadmap-header h1 { margin: 0; }
+
+  .view-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.25rem;
+  }
+  .view-toggle-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.15s, color 0.15s;
+  }
+  .view-toggle-btn.active {
+    background: var(--primary);
+    color: #fff;
+  }
+  .view-toggle-btn:not(.active):hover {
+    background: var(--surface-hover, rgba(255,255,255,0.05));
+    color: var(--text);
+  }
+
+  /* ── Status (Kanban) View ── */
+  .kanban-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .kanban-board { grid-template-columns: 1fr; } }
+
+  .kanban-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .kanban-column-header {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .kanban-column-count {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .kanban-col-open .kanban-column-header { color: var(--text-muted); }
+  .kanban-col-review .kanban-column-header { color: var(--warning); }
+  .kanban-col-progress .kanban-column-header { color: var(--primary); }
+  .kanban-col-completed .kanban-column-header { color: var(--success); }
+
+  .kanban-tickets {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 60px;
+  }
+  .kanban-ticket {
+    background: var(--surface-elevated, var(--bg));
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.65rem 0.75rem;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .kanban-ticket:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  .kanban-ticket-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+    line-height: 1.3;
+  }
+  .kanban-ticket-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .kanban-ticket-votes {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  .kanban-ticket-milestone {
+    font-size: 0.7rem;
+    color: var(--secondary);
+    background: rgba(139,92,246,0.1);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .kanban-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    padding: 1rem 0.5rem;
+  }
+
+  /* ── Milestone View ── */
+  .milestone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .milestone-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .milestone-card-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .milestone-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .milestone-status-dot.planned { background: var(--text-muted); }
+  .milestone-status-dot.in_progress { background: var(--primary); box-shadow: 0 0 6px var(--primary); }
+  .milestone-status-dot.completed { background: var(--success); }
+
+  .milestone-info { flex: 1; min-width: 0; }
+  .milestone-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+  }
+  .milestone-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+  .milestone-status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+  }
+  .milestone-status-badge.planned { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+  .milestone-status-badge.in_progress { background: rgba(59,130,246,0.15); color: var(--primary); }
+  .milestone-status-badge.completed { background: rgba(34,197,94,0.12); color: var(--success); }
+
+  .milestone-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0.25rem 0 0;
+  }
+  .milestone-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .milestone-target-date { display: flex; align-items: center; gap: 0.3rem; }
+
+  .milestone-progress-area {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    min-width: 120px;
+  }
+  .milestone-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .milestone-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--success);
+    transition: width 0.3s;
+  }
+  .milestone-progress-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .milestone-admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-icon:hover { background: var(--surface-hover, rgba(255,255,255,0.05)); color: var(--text); }
+  .btn-icon.danger:hover { background: rgba(239,68,68,0.1); color: var(--error); border-color: var(--error); }
+
+  .milestone-tickets {
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .milestone-ticket-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.65rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 0.8rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .milestone-ticket-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .chip-status-dot.open { background: var(--text-muted); }
+  .chip-status-dot.in_review { background: var(--warning); }
+  .chip-status-dot.in_progress { background: var(--primary); }
+  .chip-status-dot.completed { background: var(--success); }
+  .chip-status-dot.rejected { background: var(--error); }
+  .chip-votes { color: var(--text-muted); font-size: 0.75rem; }
+
+  .milestone-empty-tickets {
+    padding: 0.75rem 1.25rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+
+  .milestone-assign-area {
+    padding: 0.5rem 1.25rem 1rem;
+    border-top: 1px dashed var(--border);
+  }
+  .milestone-assign-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .milestone-assign-select {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.4rem 0.65rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.875rem;
+  }
+
+  .milestone-no-data {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+  }
+  .milestone-no-data p { margin: 0.5rem 0 0; font-size: 0.875rem; }
+
+  /* ── Admin: Create milestone form ── */
+  .admin-section {
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .admin-section-header {
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .admin-section-body {
+    padding: 1rem 1.25rem;
+  }
+  .admin-section-body.hidden { display: none; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 0.75rem;
+    align-items: end;
+  }
+  @media (max-width: 700px) { .form-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) { .form-row { grid-template-columns: 1fr; } }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 480px;
+    transform: translateY(10px);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 1.25rem; }
+  .modal-actions { display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.25rem; }
+</style>
+
+<div class="roadmap-header">
+  <h1><%= t('roadmap.title') %></h1>
+  <div class="view-toggle">
+    <button type="button" class="view-toggle-btn active" id="btn-status-view" onclick="switchView('status')">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="18" rx="1" stroke-width="2"/><rect x="10" y="3" width="5" height="18" rx="1" stroke-width="2"/><rect x="17" y="3" width="4" height="18" rx="1" stroke-width="2"/></svg>
+      <%= t('roadmap.statusView') %>
+    </button>
+    <button type="button" class="view-toggle-btn" id="btn-milestone-view" onclick="switchView('milestone')">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      <%= t('roadmap.milestoneView') %>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ STATUS VIEW ══ -->
+<div id="view-status">
+  <div class="kanban-board">
+    <% const kanbanCols = [
+      { key: 'open',        label: t('status.open'),        cls: 'kanban-col-open' },
+      { key: 'in_review',   label: t('status.in_review'),   cls: 'kanban-col-review' },
+      { key: 'in_progress', label: t('status.in_progress'), cls: 'kanban-col-progress' },
+      { key: 'completed',   label: t('status.completed'),   cls: 'kanban-col-completed' },
+    ] %>
+    <% kanbanCols.forEach(function(col) { %>
+      <% var colTickets = statusGroups[col.key] || [] %>
+      <div class="kanban-column <%= col.cls %>">
+        <div class="kanban-column-header">
+          <%= col.label %>
+          <span class="kanban-column-count"><%= colTickets.length %></span>
+        </div>
+        <div class="kanban-tickets">
+          <% if (colTickets.length === 0) { %>
+            <div class="kanban-empty"><%= t('roadmap.noTickets') %></div>
+          <% } else { %>
+            <% colTickets.forEach(function(ticket) { %>
+              <a href="/ticket/<%= ticket.id %>" class="kanban-ticket">
+                <div class="kanban-ticket-title"><%= ticket.title %></div>
+                <div class="kanban-ticket-meta">
+                  <span class="kanban-ticket-votes">△ <%= ticket.vote_count %></span>
+                  <span class="tag tag-<%= ticket.tag %>" style="font-size:0.7rem;padding:0.1rem 0.4rem"><%= ticket.tag %></span>
+                  <% if (ticket.milestone_title) { %>
+                    <span class="kanban-ticket-milestone" title="<%= ticket.milestone_title %>"><%= ticket.milestone_title %></span>
+                  <% } %>
+                </div>
+              </a>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ MILESTONE VIEW ══ -->
+<div id="view-milestone" style="display:none">
+
+  <% if (user && user.role === 'admin') { %>
+  <div class="admin-section">
+    <div class="admin-section-header" onclick="toggleAdminSection(this)">
+      <%= t('roadmap.createMilestone') %>
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="chevron"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </div>
+    <div class="admin-section-body hidden" id="create-milestone-body">
+      <form id="create-milestone-form">
+        <div class="form-row">
+          <div class="form-group" style="grid-column: 1 / -3">
+            <label class="form-label"><%= t('roadmap.milestoneTitle') %> *</label>
+            <input type="text" class="form-input" id="ms-title" placeholder="<%= t('roadmap.milestoneTitlePlaceholder') %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><%= t('roadmap.targetDate') %></label>
+            <input type="date" class="form-input" id="ms-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><%= t('roadmap.milestoneStatus') %></label>
+            <select class="form-input" id="ms-status">
+              <option value="planned"><%= t('roadmap.statusPlanned') %></option>
+              <option value="in_progress"><%= t('roadmap.statusInProgress') %></option>
+              <option value="completed"><%= t('roadmap.statusCompleted') %></option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:0.75rem">
+          <label class="form-label"><%= t('roadmap.milestoneDesc') %></label>
+          <textarea class="form-input" id="ms-desc" rows="2" placeholder="<%= t('roadmap.milestoneDescPlaceholder') %>" style="resize:vertical"></textarea>
+        </div>
+        <div style="margin-top:0.75rem;display:flex;justify-content:flex-end">
+          <button type="submit" class="btn btn-primary btn-small"><%= t('roadmap.createMilestoneBtn') %></button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <% } %>
+
+  <% if (milestones.length === 0) { %>
+    <div class="milestone-no-data">
+      <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--text-muted);margin:0 auto"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <p><%= t('roadmap.noMilestones') %></p>
+    </div>
+  <% } else { %>
+  <div class="milestone-list">
+    <% milestones.forEach(function(ms) { %>
+      <% var progress = ms.ticket_count > 0 ? Math.round((ms.completed_count / ms.ticket_count) * 100) : 0 %>
+      <div class="milestone-card" id="ms-card-<%= ms.id %>">
+        <div class="milestone-card-header">
+          <div class="milestone-status-dot <%= ms.status %>"></div>
+          <div class="milestone-info">
+            <div class="milestone-title-row">
+              <h2 class="milestone-title"><%= ms.title %></h2>
+              <span class="milestone-status-badge <%= ms.status %>"><%= t('roadmap.status_' + ms.status) %></span>
+            </div>
+            <% if (ms.description) { %>
+              <p class="milestone-desc"><%= ms.description %></p>
+            <% } %>
+            <div class="milestone-meta">
+              <% if (ms.target_date) { %>
+                <span class="milestone-target-date">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><path stroke-width="2" d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  <%= new Date(ms.target_date).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                </span>
+              <% } %>
+              <span><%= ms.ticket_count %> <%= t('roadmap.tickets') %></span>
+            </div>
+          </div>
+          <% if (ms.ticket_count > 0) { %>
+          <div class="milestone-progress-area">
+            <div class="milestone-progress-bar">
+              <div class="milestone-progress-fill" style="width:<%= progress %>%"></div>
+            </div>
+            <span class="milestone-progress-label"><%= progress %>%</span>
+          </div>
+          <% } %>
+          <% if (user && user.role === 'admin') { %>
+          <div class="milestone-admin-actions">
+            <button type="button" class="btn-icon" title="<%= t('common.update') %>" onclick="openEditModal(<%= ms.id %>, '<%= ms.title.replace(/'/g, \"\\\\'\" ) %>', <%= JSON.stringify(ms.description || '') %>, '<%= ms.target_date || '' %>', '<%= ms.status %>')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <button type="button" class="btn-icon danger" title="<%= t('common.delete') %>" onclick="deleteMilestone(<%= ms.id %>)">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+          <% } %>
+        </div>
+
+        <% if (ms.tickets.length > 0) { %>
+        <div class="milestone-tickets">
+          <% ms.tickets.forEach(function(ticket) { %>
+            <a href="/ticket/<%= ticket.id %>" class="milestone-ticket-chip">
+              <span class="chip-status-dot <%= ticket.status %>"></span>
+              <%= ticket.title.length > 40 ? ticket.title.substring(0, 40) + '…' : ticket.title %>
+              <span class="chip-votes">△ <%= ticket.vote_count %></span>
+              <% if (user && user.role === 'admin') { %>
+                <button type="button" onclick="event.preventDefault(); unassignTicket(<%= ticket.id %>, <%= ms.id %>)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:0;line-height:1;margin-left:0.2rem" title="<%= t('roadmap.unassign') %>">×</button>
+              <% } %>
+            </a>
+          <% }) %>
+        </div>
+        <% } else { %>
+        <div class="milestone-empty-tickets"><%= t('roadmap.noTicketsAssigned') %></div>
+        <% } %>
+
+        <% if (user && user.role === 'admin' && unassignedTickets.length > 0) { %>
+        <div class="milestone-assign-area">
+          <div class="milestone-assign-row">
+            <select class="milestone-assign-select" id="assign-select-<%= ms.id %>">
+              <option value=""><%= t('roadmap.assignTicket') %></option>
+              <% unassignedTickets.forEach(function(t_) { %>
+                <option value="<%= t_.id %>">#<%= t_.id %> – <%= t_.title.substring(0, 60) %></option>
+              <% }) %>
+            </select>
+            <button type="button" class="btn btn-small btn-secondary" onclick="assignTicket(<%= ms.id %>)"><%= t('roadmap.assign') %></button>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+  <% } %>
+</div>
+
+<!-- ── Edit Milestone Modal ── -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <h3 class="modal-title"><%= t('roadmap.editMilestone') %></h3>
+    <input type="hidden" id="edit-ms-id">
+    <div class="form-group">
+      <label class="form-label"><%= t('roadmap.milestoneTitle') %> *</label>
+      <input type="text" class="form-input" id="edit-ms-title">
+    </div>
+    <div class="form-group" style="margin-top:0.75rem">
+      <label class="form-label"><%= t('roadmap.milestoneDesc') %></label>
+      <textarea class="form-input" id="edit-ms-desc" rows="2" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem">
+      <div class="form-group">
+        <label class="form-label"><%= t('roadmap.targetDate') %></label>
+        <input type="date" class="form-input" id="edit-ms-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label"><%= t('roadmap.milestoneStatus') %></label>
+        <select class="form-input" id="edit-ms-status">
+          <option value="planned"><%= t('roadmap.statusPlanned') %></option>
+          <option value="in_progress"><%= t('roadmap.statusInProgress') %></option>
+          <option value="completed"><%= t('roadmap.statusCompleted') %></option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary btn-small" onclick="closeEditModal()"><%= t('common.cancel') %></button>
+      <button type="button" class="btn btn-primary btn-small" onclick="saveEditMilestone()"><%= t('common.save') %></button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── View switching ──
+  var currentView = localStorage.getItem('roadmap_view') || 'status';
+  switchView(currentView, true);
+
+  window.switchView = function(view, init) {
+    currentView = view;
+    if (!init) localStorage.setItem('roadmap_view', view);
+    document.getElementById('view-status').style.display = view === 'status' ? '' : 'none';
+    document.getElementById('view-milestone').style.display = view === 'milestone' ? '' : 'none';
+    document.getElementById('btn-status-view').classList.toggle('active', view === 'status');
+    document.getElementById('btn-milestone-view').classList.toggle('active', view === 'milestone');
+  };
+
+  // ── Admin section toggle ──
+  window.toggleAdminSection = function(header) {
+    var body = document.getElementById('create-milestone-body');
+    body.classList.toggle('hidden');
+    header.querySelector('.chevron').style.transform = body.classList.contains('hidden') ? '' : 'rotate(180deg)';
+  };
+
+  // ── Create milestone ──
+  var createForm = document.getElementById('create-milestone-form');
+  if (createForm) {
+    createForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var title = document.getElementById('ms-title').value.trim();
+      if (!title) return;
+      var body = {
+        title: title,
+        description: document.getElementById('ms-desc').value.trim() || undefined,
+        target_date: document.getElementById('ms-date').value || undefined,
+        status: document.getElementById('ms-status').value,
+      };
+      try {
+        var token = localStorage.getItem('token');
+        var res = await fetch('/api/milestones', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Error');
+        location.reload();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  }
+
+  // ── Edit modal ──
+  window.openEditModal = function(id, title, desc, date, status) {
+    document.getElementById('edit-ms-id').value = id;
+    document.getElementById('edit-ms-title').value = title;
+    document.getElementById('edit-ms-desc').value = desc;
+    document.getElementById('edit-ms-date').value = date;
+    document.getElementById('edit-ms-status').value = status;
+    document.getElementById('edit-modal').classList.add('open');
+  };
+  window.closeEditModal = function() {
+    document.getElementById('edit-modal').classList.remove('open');
+  };
+  document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
+
+  window.saveEditMilestone = async function() {
+    var id = document.getElementById('edit-ms-id').value;
+    var title = document.getElementById('edit-ms-title').value.trim();
+    if (!title) return;
+    var dateVal = document.getElementById('edit-ms-date').value;
+    var body = {
+      title: title,
+      description: document.getElementById('edit-ms-desc').value.trim() || '',
+      target_date: dateVal || null,
+      status: document.getElementById('edit-ms-status').value,
+    };
+    try {
+      var token = localStorage.getItem('token');
+      var res = await fetch('/api/milestones/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Error');
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // ── Delete milestone ──
+  window.deleteMilestone = async function(id) {
+    if (!confirm('<%= t("roadmap.deleteConfirm") %>')) return;
+    try {
+      var token = localStorage.getItem('token');
+      var res = await fetch('/api/milestones/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Error');
+      var card = document.getElementById('ms-card-' + id);
+      if (card) card.remove();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // ── Assign ticket ──
+  window.assignTicket = async function(milestoneId) {
+    var sel = document.getElementById('assign-select-' + milestoneId);
+    var ticketId = sel ? sel.value : '';
+    if (!ticketId) return;
+    try {
+      var token = localStorage.getItem('token');
+      var res = await fetch('/api/milestones/' + milestoneId + '/tickets/' + ticketId, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Error');
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // ── Unassign ticket ──
+  window.unassignTicket = async function(ticketId, milestoneId) {
+    try {
+      var token = localStorage.getItem('token');
+      var res = await fetch('/api/milestones/tickets/' + ticketId, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Error');
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+})();
+</script>
+
+<%- include('partials/footer') %>

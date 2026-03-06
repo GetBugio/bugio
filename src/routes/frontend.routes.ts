@@ -4,6 +4,7 @@ import { config } from '../config.js';
 import { ticketService } from '../services/ticket.service.js';
 import { settingsService } from '../services/settings.service.js';
 import { authService } from '../services/auth.service.js';
+import { milestoneService } from '../services/milestone.service.js';
 import { getDatabase } from '../db/connection.js';
 import { getT, getJsTranslations, parseLangFromCookie } from '../services/i18n.service.js';
 import { getTenantRecord } from '../db/registry.js';
@@ -186,6 +187,55 @@ router.get('/', (req: Request, res: Response) => {
   } else {
     res.render('index', { ...viewData, title: common.t('tickets.title') });
   }
+});
+
+// Roadmap page
+router.get('/roadmap', (req: Request, res: Response) => {
+  const common = getCommonViewData(req);
+
+  // Milestone-based data
+  const milestones = milestoneService.list();
+  const unassignedTickets = common.user?.role === 'admin' ? milestoneService.getTicketsWithoutMilestone() : [];
+
+  // Status-based kanban data (feature tickets only)
+  const db = getDatabase();
+  const statusGroups: Record<string, { id: number; title: string; tag: string; vote_count: number; milestone_id: number | null; milestone_title?: string }[]> = {
+    open: [],
+    in_review: [],
+    in_progress: [],
+    completed: [],
+  };
+
+  const featureTickets = db.prepare(`
+    SELECT t.id, t.title, t.tag, t.status, t.milestone_id,
+           (SELECT COUNT(*) FROM votes WHERE ticket_id = t.id) as vote_count,
+           m.title as milestone_title
+    FROM tickets t
+    LEFT JOIN milestones m ON t.milestone_id = m.id
+    WHERE t.deleted_at IS NULL AND t.tag = 'feature' AND t.status != 'rejected'
+    ORDER BY vote_count DESC, t.created_at DESC
+  `).all() as { id: number; title: string; tag: string; status: string; vote_count: number; milestone_id: number | null; milestone_title: string | null }[];
+
+  for (const ticket of featureTickets) {
+    if (ticket.status in statusGroups) {
+      statusGroups[ticket.status].push({
+        id: ticket.id,
+        title: ticket.title,
+        tag: ticket.tag,
+        vote_count: ticket.vote_count,
+        milestone_id: ticket.milestone_id,
+        milestone_title: ticket.milestone_title || undefined,
+      });
+    }
+  }
+
+  res.render('roadmap', {
+    ...common,
+    title: common.t('roadmap.title'),
+    milestones,
+    unassignedTickets,
+    statusGroups,
+  });
 });
 
 // Create ticket page

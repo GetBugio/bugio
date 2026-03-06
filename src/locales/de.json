@@ -11,7 +11,8 @@
     "register": "Registrieren",
     "toggleTheme": "Theme umschalten",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "roadmap": "Roadmap"
   },
   "common": {
     "save": "Speichern",
@@ -171,6 +172,34 @@
     "version": "Version",
     "license": "Lizenz",
     "logoutBtn": "Abmelden"
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "statusView": "Status",
+    "milestoneView": "Meilensteine",
+    "noTickets": "Keine Features",
+    "noMilestones": "Noch keine Meilensteine definiert.",
+    "noTicketsAssigned": "Keine Tickets zugewiesen.",
+    "createMilestone": "Neuen Meilenstein anlegen",
+    "editMilestone": "Meilenstein bearbeiten",
+    "milestoneTitle": "Titel",
+    "milestoneTitlePlaceholder": "z.B. Version 2.0",
+    "milestoneDesc": "Beschreibung",
+    "milestoneDescPlaceholder": "Kurze Beschreibung dieses Meilensteins...",
+    "milestoneStatus": "Status",
+    "targetDate": "Zieldatum",
+    "createMilestoneBtn": "Meilenstein erstellen",
+    "tickets": "Tickets",
+    "assignTicket": "Ticket zuweisen...",
+    "assign": "Zuweisen",
+    "unassign": "Zuweisung entfernen",
+    "deleteConfirm": "Meilenstein wirklich löschen? Alle Tickets werden davon getrennt.",
+    "statusPlanned": "Geplant",
+    "statusInProgress": "In Bearbeitung",
+    "statusCompleted": "Abgeschlossen",
+    "status_planned": "Geplant",
+    "status_in_progress": "In Bearbeitung",
+    "status_completed": "Abgeschlossen"
   },
   "error": {
     "pageNotFound": "Seite nicht gefunden",

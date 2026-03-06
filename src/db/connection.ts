@@ -7,17 +7,24 @@ import { SCHEMA } from './schema.js';
 
 // Run schema migrations for existing databases (ALTER TABLE for new columns)
 function runMigrations(database: Database.Database): void {
-  const columns = database.pragma('table_info(users)') as { name: string }[];
-  const names = new Set(columns.map(c => c.name));
+  const userColumns = database.pragma('table_info(users)') as { name: string }[];
+  const userColNames = new Set(userColumns.map(c => c.name));
 
-  if (!names.has('email_verified')) {
+  if (!userColNames.has('email_verified')) {
     database.exec('ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0');
   }
-  if (!names.has('email_verification_token')) {
+  if (!userColNames.has('email_verification_token')) {
     database.exec('ALTER TABLE users ADD COLUMN email_verification_token TEXT');
   }
-  if (!names.has('email_verified_at')) {
+  if (!userColNames.has('email_verified_at')) {
     database.exec('ALTER TABLE users ADD COLUMN email_verified_at TEXT');
+  }
+
+  const ticketColumns = database.pragma('table_info(tickets)') as { name: string }[];
+  const ticketColNames = new Set(ticketColumns.map(c => c.name));
+
+  if (!ticketColNames.has('milestone_id')) {
+    database.exec('ALTER TABLE tickets ADD COLUMN milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL');
   }
 }
 

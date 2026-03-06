@@ -11,7 +11,8 @@
     "register": "Register",
     "toggleTheme": "Toggle theme",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "roadmap": "Roadmap"
   },
   "common": {
     "save": "Save",
@@ -171,6 +172,34 @@
     "version": "Version",
     "license": "License",
     "logoutBtn": "Logout"
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "statusView": "Status",
+    "milestoneView": "Milestones",
+    "noTickets": "No features",
+    "noMilestones": "No milestones defined yet.",
+    "noTicketsAssigned": "No tickets assigned.",
+    "createMilestone": "Create New Milestone",
+    "editMilestone": "Edit Milestone",
+    "milestoneTitle": "Title",
+    "milestoneTitlePlaceholder": "e.g. Version 2.0",
+    "milestoneDesc": "Description",
+    "milestoneDescPlaceholder": "Short description of this milestone...",
+    "milestoneStatus": "Status",
+    "targetDate": "Target Date",
+    "createMilestoneBtn": "Create Milestone",
+    "tickets": "Tickets",
+    "assignTicket": "Assign ticket...",
+    "assign": "Assign",
+    "unassign": "Remove assignment",
+    "deleteConfirm": "Really delete this milestone? All tickets will be unassigned.",
+    "statusPlanned": "Planned",
+    "statusInProgress": "In Progress",
+    "statusCompleted": "Completed",
+    "status_planned": "Planned",
+    "status_in_progress": "In Progress",
+    "status_completed": "Completed"
   },
   "error": {
     "pageNotFound": "Page Not Found",

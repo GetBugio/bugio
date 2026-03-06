@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import ticketRoutes from './ticket.routes.js';
 import settingsRoutes from './settings.routes.js';
+import milestoneRoutes from './milestone.routes.js';
 import registrationRoutes from './registration.routes.js';
 import tenantStatusRoutes from './tenant-status.routes.js';
 import billingRoutes from './billing.routes.js';
@@ -14,6 +15,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/tickets', ticketRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/milestones', milestoneRoutes);
 
 // Mount cloudhosted-only routes
 if (config.isCloudhosted) {

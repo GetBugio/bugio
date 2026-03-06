@@ -9,6 +9,36 @@ export type TicketTag = 'bug' | 'feature';
 // Ticket status workflow
 export type TicketStatus = 'open' | 'in_review' | 'in_progress' | 'rejected' | 'completed';
 
+// Milestone status
+export type MilestoneStatus = 'planned' | 'in_progress' | 'completed';
+
+// Milestone entity
+export interface Milestone {
+  id: number;
+  title: string;
+  description: string | null;
+  target_date: string | null;
+  status: MilestoneStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+// Milestone with aggregated ticket info
+export interface MilestoneWithTickets extends Milestone {
+  tickets: MilestoneTicket[];
+  ticket_count: number;
+  completed_count: number;
+}
+
+// Ticket info as used in milestone context
+export interface MilestoneTicket {
+  id: number;
+  title: string;
+  tag: TicketTag;
+  status: TicketStatus;
+  vote_count: number;
+}
+
 // User entity
 export interface User {
   id: number;
@@ -36,6 +66,7 @@ export interface Ticket {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;  // soft delete
+  milestone_id: number | null;
 }
 
 // Ticket with vote count and author info
@@ -105,6 +136,20 @@ export interface UpdateTicketStatusRequest {
 
 export interface CreateCommentRequest {
   content: string;
+}
+
+export interface CreateMilestoneRequest {
+  title: string;
+  description?: string;
+  target_date?: string;
+  status?: MilestoneStatus;
+}
+
+export interface UpdateMilestoneRequest {
+  title?: string;
+  description?: string;
+  target_date?: string | null;
+  status?: MilestoneStatus;
 }
 
 export interface RegisterRequest {

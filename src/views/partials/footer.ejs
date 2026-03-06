@@ -11,6 +11,7 @@
       else if (path === '/settings') page = 'settings';
       else if (path === '/login') page = 'login';
       else if (path === '/register') page = 'register';
+      else if (path === '/roadmap') page = 'roadmap';
       else if (path.startsWith('/ticket/')) page = 'tickets';
 
       document.querySelectorAll('[data-page="' + page + '"]').forEach(function(el) {
