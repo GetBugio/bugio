@@ -18,7 +18,8 @@ export class MilestoneService {
           WHEN 'planned' THEN 1
           WHEN 'completed' THEN 2
         END,
-        target_date ASC NULLS LAST,
+        CASE WHEN target_date IS NULL THEN 1 ELSE 0 END,
+        target_date ASC,
         created_at ASC
     `).all() as Milestone[];
 
